@@ -17,9 +17,11 @@ what's not in a file, the agent doesn't know. Learners feel the context window,
 
 ## Tooling
 
-Plain **markdown files** (`.md`). Optionally open the folder as an **Obsidian
-vault** for a nice UI — but Claude Code only needs the files, so Obsidian is a
-bonus, not a requirement.
+Plain **markdown files** (`.md`) — Claude Code only needs the files. As an
+optional "see it" layer, open the folder as an **Obsidian vault** for a friendly
+UI and a **graph view** of your notes and links. Short cross-platform guide (with
+an "extra practice" arc): [`OBSIDIAN.md`](OBSIDIAN.md). Obsidian is a bonus, not a
+requirement.
 
 ## What's here
 

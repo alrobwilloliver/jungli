@@ -8,6 +8,9 @@
 # Keep local only; the sanitised markdown extract lives in source/survey-responses.md
 source/*.xlsx
 
+# Obsidian vault config (created when a vault folder is opened in Obsidian)
+.obsidian/
+
 # Node (for when the projects run)
 node_modules/
 .env
