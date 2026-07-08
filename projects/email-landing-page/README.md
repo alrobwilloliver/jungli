@@ -28,6 +28,9 @@ The first project in the track. A plain **HTML/CSS/JS** landing page with a real
 
 Target **Vercel** (static site) for consistency with the rest of the track.
 
+**Live reference:** [email-capture-demo-live.vercel.app](https://email-capture-demo-live.vercel.app)
+— the `finished/` Andrea build, deployed as the Day-1 "here's one I built" example.
+
 ## Teaching flow (from `skeleton/PROMPTS.md`)
 
 1. Intake questions → reduce to *"I help [audience] get [result] through [offer]."*
