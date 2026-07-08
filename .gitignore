@@ -4,9 +4,14 @@
 # Local Claude Code settings (machine-specific, not shared)
 .claude/settings.local.json
 
-# Raw survey export — contains applicant contact details (email/phone).
-# Keep local only; the sanitised markdown extract lives in source/survey-responses.md
+# Applicant PII — raw export + per-respondent detail. Keep local only.
+# The sanitised, aggregates-only extract lives in source/survey-responses.md
 source/*.xlsx
+source/survey-respondents-private.md
+
+# Generated slide exports (build from the .md with Marp; don't commit)
+curriculum/teaching-pack/slides/*.html
+curriculum/teaching-pack/slides/*.pdf
 
 # Obsidian vault config (created when a vault folder is opened in Obsidian)
 .obsidian/
