@@ -1,5 +1,24 @@
 # Prompts
 
+## 0. Start your own copy — do this first
+
+> **Don't build inside the course folder.** The `jungli` repo you cloned is a
+> read-only textbook: you can't push to it, and you don't want to. Your work
+> lives in its own folder that *you* own and will deploy.
+
+Paste this into the Code tab to spin up your own project:
+
+```text
+Make a new folder called "my-landing-page" in my home directory — NOT inside the
+jungli course folder. Copy the starter files from the email-landing-page skeleton
+in the course repo into it. Then initialise a fresh git repo there and make a
+first commit ("Start my landing page"). Confirm we're now working in
+my-landing-page, not in the course repo.
+```
+
+You'll push this to your *own* new GitHub repo and deploy it on Day 1 (lesson 1.3).
+It stays yours.
+
 ## 1. Intake Questions
 
 Use these first to define the page:

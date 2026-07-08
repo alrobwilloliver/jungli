@@ -2,6 +2,24 @@
 
 A build flow for your context-grounded chat agent. Small steps, commit often.
 
+## 0. Start your own copy — do this first
+
+> **Don't build inside the course folder.** The `jungli` repo you cloned is a
+> read-only textbook: you can't push to it, and you don't want to. Your work
+> lives in its own folder that *you* own and will deploy.
+
+Paste this into the Code tab to spin up your own project:
+
+```text
+Make a new folder called "my-chat-agent" in my home directory — NOT inside the
+jungli course folder. Copy the starter files from the chat-agent skeleton in the
+course repo into it (including the sample-persona/ folder). Then initialise a fresh
+git repo there and make a first commit ("Start my chat agent"). Confirm we're now
+working in my-chat-agent, not in the course repo.
+```
+
+You'll push this to your *own* new GitHub repo and deploy it on Vercel. It stays yours.
+
 ## 1. Choose your persona
 
 - **Job-seeker:** context = your career (CV, projects) from your Build-2 brain.

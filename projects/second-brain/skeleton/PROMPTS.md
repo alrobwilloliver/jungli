@@ -2,6 +2,24 @@
 
 A simple build flow for your second brain. Work in small steps and commit often.
 
+## 0. Start your own copy — do this first
+
+> **Don't build inside the course folder.** The `jungli` repo you cloned is a
+> read-only textbook: you can't push to it, and you don't want to. Your work
+> lives in its own folder that *you* own.
+
+Paste this into the Code tab to spin up your own project:
+
+```text
+Make a new folder called "my-second-brain" in my home directory — NOT inside the
+jungli course folder. Copy the starter files from the second-brain skeleton in the
+course repo into it (including the vault/ folder). Then initialise a fresh git repo
+there and make a first commit ("Start my second brain"). Confirm we're now working
+in my-second-brain, not in the course repo.
+```
+
+You'll push this to your *own* new GitHub repo later. It stays yours.
+
 ## Weekend lite path (taster Day 2)
 
 On the 2-day weekend taster? **Start here** — a gentler version of the full flow
