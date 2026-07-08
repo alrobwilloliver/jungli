@@ -2,6 +2,31 @@
 
 A simple build flow for your second brain. Work in small steps and commit often.
 
+## Weekend lite path (taster Day 2)
+
+On the 2-day weekend taster? **Start here** — a gentler version of the full flow
+below. You don't need a CV; a few sentences about yourself is plenty.
+
+**1. Capture (from a few sentences):**
+```text
+Here are a few sentences about me: [paste 4–6 sentences]. Turn them into a few
+short markdown notes in a vault/ folder — one idea per file, clear titles, with
+[[links]] between related notes. Then make vault/index.md that lists them.
+```
+
+**2. Ask it something (the payoff):**
+```text
+Using ONLY the notes in vault/, answer this: [a question about you]. If it isn't in
+the notes, tell me what's missing instead of guessing.
+```
+
+**3. Grow it (optional):** add a few more linked notes, then open the vault in
+Obsidian to *see* the graph — see [`OBSIDIAN.md`](OBSIDIAN.md).
+
+The full, course-level flow follows.
+
+---
+
 ## 1. Intake — what is this brain about?
 
 - Whose / what knowledge is this? (you, for a job hunt — or your product, for customers)

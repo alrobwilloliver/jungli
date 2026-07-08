@@ -5,6 +5,10 @@ The second project. Turn a pile of notes, a CV, or product info into a structure
 over. This is the body of context that **Build 3's chat agent answers from.**
 Pairs with Build 2 in [`../../curriculum/lesson-plans.md`](../../curriculum/lesson-plans.md).
 
+Used two ways: the **5-day course** (Build 2, full flow) and the **weekend taster**
+(Day 2 — the gentler *Weekend lite path* at the top of
+[`skeleton/PROMPTS.md`](skeleton/PROMPTS.md)).
+
 > **Two persona angles, same build:**
 > - **Job-seeker** → your *career brain* (CV, projects, history) → feeds your recruiter chat bot.
 > - **Entrepreneur** → your *product brain* (offer, features, FAQ) → feeds your customer chat bot.

@@ -40,7 +40,7 @@ Headline findings that drive every design decision:
 | Decision | Choice | Why |
 |---|---|---|
 | Format | **5-day residential sprint** | Matches the residency + a top-picked format |
-| Formats (dual) | **5-day (Alan's focus) + a 2-day weekend taster = the Foundation core** | One foundation, two formats: taster = Sessions 1–2 (Builds 1–2 + token/context/limit literacy); 5-day adds Sessions 3–5. Taster co-designed with the other two tracks later |
+| Formats (dual) | **2-day weekend Foundation + 5-day course = a 7-day path** | Two *standalone* products, stackable (Sat+Sun taster, then Mon–Fri course). Weekend = Sat: basic landing page → Sun: second-brain lite (+ optional Obsidian). 5-day course stands alone too. A 7-day learner meets the core moves twice on escalating builds — **reinforcement, not repetition** (spaced repetition), NOT a subset. Weekend **may be owned/co-designed by a colleague** — Alan's focus is the **5-day main agentic track**. See `curriculum/weekend-foundation.md`. |
 | Schedule | **Mon→Fri sprint + Sat/Sun taster** | 5-day sprint = Mon–Fri. Mon–Wed are structured morning sessions (Alan teaches); Thu = cross-track day (all 3 tracks simultaneously, learners self-direct their own project, instructors float); Fri morning = ship + demo. Weekend taster = Sat (full day) + Sun (shared cross-track day, partial instructor time). Alan has a full-time job — mornings only on weekdays. *Pending team confirmation of exact dates.* |
 | Level | **Claude Code spine, taught 0→1** | Audience is mostly beginners; assume no terminal/GitHub |
 | Tool surface | **Claude desktop app (Code tab), not the terminal** | Beginners use buttons; the app bundles Claude Code; terminal/web are power-user surfaces. Onboarding = paste `setup-prompt.md` into the app |
@@ -66,13 +66,15 @@ original, preserved for reference.
 ```
 CLAUDE.md                      ← you are here
 README.md                      ← human-facing overview
+brand/                         ← Jungli slide branding: Marp theme + brand guide + starter deck
 curriculum/
   ai-agents-track.md           ← the 5-day syllabus (learner-facing)
+  weekend-foundation.md        ← the 2-day weekend taster syllabus (learner-facing)
   lesson-plans.md              ← instructor teaching script: concept→demo→build→trap per session
-  teaching-pack/               ← slide-ready per-day lessons: talking points + tasks + base prompts (day-1..5 + README)
+  teaching-pack/               ← slide-ready lessons: talking points + tasks + base prompts (day-1..5 + weekend-day-1..2 + README)
 projects/                      ← build-along projects (each: skeleton/ + finished/ + slides/)
   email-landing-page/          ← Build 1: landing page + Kit email capture (from Alan's demo)
-  second-brain/                ← Build 2: context/memory as a markdown vault
+  second-brain/                ← Build 2: context/memory as a markdown vault (+ OBSIDIAN.md optional frontend)
   chat-agent/                  ← Build 3: chat grounded in your docs (career/product bot)
 prep/
   prerequisites.md             ← SHARED baseline for all residents (pre-arrival)
@@ -111,7 +113,10 @@ source/
 - [ ] Build `finished/` references for second-brain & chat-agent (chat-agent: privacy-safe, sample persona; live ref = alanoliver.dev)
 - [ ] Pick + test the demo skill (superpowers) and the demo MCP for Saturday
 - [ ] Copy the remaining real project files in (clean working builds for each project) when ready
-- [ ] Down the line: `git init` + publish this repo as the GitHub teaching project residents clone
+- [x] `git init` + pushed **private** to `github.com/alrobwilloliver/jungli` (2026-07-05); survey `.xlsx` gitignored (applicant PII). Commits use repo-local identity `Alan Oliver <49719658+alrobwilloliver@users.noreply.github.com>`. Making it **public** for residents = later (recheck survey extract first).
+- [x] `brand/` slide kit — Marp theme + brand guide + starter deck, extracted from junglithenomad.com. Build decks: `npx @marp-team/marp-cli DECK.md --theme-set brand/theme/jungli.css -o out.html`.
+- [x] Weekend Foundation authored: `curriculum/weekend-foundation.md` + `teaching-pack/weekend-day-1..2.md`; second-brain `OBSIDIAN.md` optional frontend + weekend lite path in `skeleton/PROMPTS.md`. **(Weekend may be a colleague's to own — confirm; Alan's focus = the 5-day main track.)**
+- [ ] **Next up: build the main-track Day 1 slide deck** from `teaching-pack/day-1.md` using the Jungli Marp theme.
 
 ### Verified facts baked into `prep/` (June 2026 — re-check before each cohort)
 - **Primary surface = the Claude desktop app's Code tab** (GUI, buttons), NOT the terminal CLI. Download: `https://claude.ai/download`. The app **bundles Claude Code** — no separate CLI install. (Terminal CLI + web are power-user surfaces; CLI install still exists: Win `irm https://claude.ai/install.ps1 | iex`, Mac `curl -fsSL https://claude.ai/install.sh | bash`.)

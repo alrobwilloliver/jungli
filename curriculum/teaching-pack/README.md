@@ -9,6 +9,9 @@ straight into PowerPoints + student handouts.
   into its own deck — the lessons are clearly delimited either way.
 - Pairs with [`../lesson-plans.md`](../lesson-plans.md) (the timed facilitation
   script) and the build projects in [`../../projects`](../../projects).
+- **Weekend taster:** `weekend-day-1.md` (Sat — ship a basic site) +
+  `weekend-day-2.md` (Sun — second-brain lite + optional Obsidian). The gentle
+  2-day on-ramp; syllabus in [`../weekend-foundation.md`](../weekend-foundation.md).
 
 ## How each lesson is laid out
 
