@@ -37,9 +37,13 @@ and there are ways to keep costs down — below.
 
 - Your usage is **shared** between Claude.ai (the chat) and Claude Code — it's
   one pool, not two.
-- Limits work on a rolling basis: a **~5-hour session window** plus an overall
-  **weekly cap**. Anthropic doesn't publish exact hour numbers, and they vary, so
-  treat the points below as practical guidance, not a contract.
+- Limits work on a rolling basis: a **5-hour session window** (resets every 5
+  hours) plus an overall **weekly cap** across all models. Anthropic
+  [states this on the Pro plan page](https://support.claude.com/en/articles/8325606-what-is-the-pro-plan)
+  but **doesn't publish exact hour/message numbers** — they vary by model, message
+  length and file size, so treat the points below as practical guidance, not a
+  contract. Check *your* live usage in **Settings → Usage** (chat) or **`/status`**
+  (Claude Code).
 - On a relaxed day, **Pro is fine.** On a heavy, build-all-day-and-evening day,
   a Pro user *can* bump into the limit late in the day.
 
@@ -103,8 +107,10 @@ both your costs and the price you advertise.
 
 ---
 
-### Sources (verified June 2026)
+### Sources (verified June 2026 · usage limits re-confirmed July 2026)
 - [Claude pricing](https://claude.com/pricing)
+- [What is the Pro plan?](https://support.claude.com/en/articles/8325606-what-is-the-pro-plan) — states the 5-hour session reset + weekly cap
+- [How usage and length limits work](https://support.claude.com/en/articles/11647753-how-do-usage-and-length-limits-work)
 - [Use Claude Code with your Pro or Max plan](https://support.claude.com/en/articles/11145838-use-claude-code-with-your-pro-or-max-plan)
 - [Models, usage, and limits in Claude Code](https://support.claude.com/en/articles/14552983-models-usage-and-limits-in-claude-code)
 - [What is the Team plan?](https://support.claude.com/en/articles/9266767-what-is-the-team-plan)

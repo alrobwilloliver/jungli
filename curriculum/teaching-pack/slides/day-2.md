@@ -230,7 +230,8 @@ to save my usage, and why?
 ## Limits on Pro
 
 - **Pro ($20):** usage is **shared** with your normal Claude chats.
-- It resets on a **rolling window** *plus* a **weekly cap**.
+- Two limits: a **5-hour session window** (resets every 5h) *plus* a
+  **weekly cap** — check yours with **`/status`**.
 - Make it last: right model · `/clear` per task · don't leave it idle ·
   lean on **files**, not one endless chat.
 
