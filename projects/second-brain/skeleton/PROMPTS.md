@@ -39,7 +39,7 @@ the notes, tell me what's missing instead of guessing.
 ```
 
 **3. Grow it (optional):** add a few more linked notes, then open the vault in
-Obsidian to *see* the graph — see [`OBSIDIAN.md`](OBSIDIAN.md).
+Obsidian to *see* the graph — see [`OBSIDIAN.md`](../OBSIDIAN.md).
 
 The full, course-level flow follows.
 
