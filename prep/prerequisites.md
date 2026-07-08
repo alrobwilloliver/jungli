@@ -59,6 +59,11 @@ You're ready for Day 1 when:
 - [ ] You can sign in to **github.com** and **vercel.com**
 - [ ] You ran the **setup prompt** and Claude created your test file
 
+### How you'll work with the course files
+You'll clone this repo as your **course textbook** and build each project in its
+**own** folder that you own. One quick read explains how so you don't get stuck
+trying to commit to the textbook: [`working-on-your-own-projects.md`](working-on-your-own-projects.md).
+
 ### If you get stuck
 Don't worry — bring it to Day 1 and we'll sort it in the first hour. But please
 *try* the steps first. Note any error messages (a screenshot is perfect).
