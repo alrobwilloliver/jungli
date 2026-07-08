@@ -13,8 +13,19 @@ brand/
 ├── README.md          ← you are here
 ├── brand-guide.md     ← colours, type, voice, do's & don'ts
 ├── theme/
-│   └── jungli.css      ← the Marp theme (all the styling)
+│   ├── jungli.css      ← the Marp **slide** theme (dark, for decks)
+│   └── jungli-doc.css  ← the **document** theme (light, for printable handouts/guides)
 └── template-deck.md   ← starter deck with every slide type — copy this to begin
+```
+
+**Two themes, one palette.** Use `jungli.css` for **slides** (dark jungle background,
+via Marp). Use `jungli-doc.css` for **documents** — workshop guides, handouts, anything
+meant to be read or printed (cream background, jungle-green headings, marigold accents).
+Render a doc to a branded PDF:
+
+```bash
+npx md-to-pdf --stylesheet brand/theme/jungli-doc.css \
+  --pdf-options '{"printBackground":true,"format":"A4"}' path/to/guide.md
 ```
 
 ## Make a deck (3 steps)

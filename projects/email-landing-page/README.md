@@ -14,7 +14,7 @@ The first project in the track. A plain **HTML/CSS/JS** landing page with a real
 |---|---|
 | `skeleton/` | The **starting point** — docs only (`README`, `CLAUDE.md`, `PROMPTS.md`). Learners begin here and build the site *from the prompts*, so they generate it themselves rather than copy it. |
 | `finished/` | A **reference build** — the same page completed, using a **Kit embed form** (no API key needed). For the instructor and for learners who get stuck. |
-| `slides/` | `workshop-guide.pdf` (the step-by-step) + PPT slides to add. |
+| `slides/` | `workshop-guide.md` — the branded step-by-step **learner handout**, aligned to the current design (Claude app · spin-out folder · Vercel · Kit embed). Rendered to `workshop-guide.pdf` with the Jungli **document** theme. *(`workshop-guide-LEGACY-do-not-ship.pdf` is the old pre-re-levelling version — reference only, don't hand it out.)* |
 
 ## Email provider: Kit (formerly ConvertKit)
 
