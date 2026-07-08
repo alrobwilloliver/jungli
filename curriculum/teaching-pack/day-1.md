@@ -49,8 +49,9 @@ Create a file called hello.txt that says hello, then tell me what you just did a
 - Add the **email form** — a Kit embed (drop-in; no API key needed).
 
 **Resources:** [`email-landing-page/skeleton/PROMPTS.md`](../../projects/email-landing-page/skeleton/PROMPTS.md)
-· the [`finished/`](../../projects/email-landing-page/finished) reference · a Kit
-embed code.
+· the [`finished/`](../../projects/email-landing-page/finished) reference ·
+[`KIT-SETUP.md`](../../projects/email-landing-page/skeleton/KIT-SETUP.md) (click-by-click:
+create the form + copy the embed, no API key).
 
 **Practical task:** build your own landing page for a real (or pretend) offer; add
 the Kit signup form.

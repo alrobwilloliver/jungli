@@ -58,6 +58,9 @@ Make the design feel more polished while keeping the code simple and the layout 
 
 ## 4. Kit Integration Prompt
 
+**New to Kit?** Follow [`KIT-SETUP.md`](KIT-SETUP.md) first — it's the click-by-click
+for creating your form and copying the embed code (no API key needed on Day 1).
+
 Once you have real Kit embed code:
 
 ```text

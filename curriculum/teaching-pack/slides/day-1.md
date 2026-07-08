@@ -165,7 +165,8 @@ Shout if you get stuck.
 
 ## Add the email form
 
-A **Kit** embed — drop-in, **no API key needed**:
+Create a form in **Kit** and copy its embed — *steps in* `KIT-SETUP.md`.
+Drop-in, **no API key needed**:
 
 ```text
 Integrate this email signup embed into the signup section
