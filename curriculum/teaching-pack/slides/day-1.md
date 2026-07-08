@@ -87,6 +87,23 @@ then tell me what you just did and why.
 
 ---
 
+<!-- _class: build -->
+
+## First: start your own copy
+
+> **Don't build inside the course folder** — that's the read-only textbook. Your
+> site lives in its own folder that *you* own and deploy.
+
+Paste this before anything else:
+
+```text
+Make a new folder "my-landing-page" in my home directory — NOT inside the jungli
+course folder. Copy the email-landing-page skeleton into it, start a fresh git
+repo, and confirm we're working there.
+```
+
+---
+
 ## Start with the offer
 
 Before you prompt, get clear on three things:
