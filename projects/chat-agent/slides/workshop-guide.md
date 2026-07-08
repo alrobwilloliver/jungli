@@ -35,8 +35,8 @@ API key safely. No coding needed.**
 >   [`prep/prerequisites.md`](../../../prep/prerequisites.md) if anything's missing.
 > - **Context to ground the agent** — the sample persona (provided), or your own
 >   CV / product notes (ideally your **Build-2 second brain**).
-> - **An LLM API key** from your model provider. Calling the model costs a little
->   per message — your instructor will point you to the right key.
+> - **A free OpenRouter API key** (no card needed) — the chat calls a free AI
+>   model. Steps in [`MODEL-SETUP.md`](../skeleton/MODEL-SETUP.md).
 
 ---
 
@@ -128,13 +128,14 @@ Ask it about **Sam** — then try a question it *can't* know from the context.
 This is the real lesson of the day.
 
 - An **API** = asking another service (the AI model) to do something for you.
-- An **API key** = your **password** to that service — and it's tied to **your
-  bill**. So it stays **secret**.
+- An **API key** = your **password** to that service. Ours is a **free OpenRouter**
+  key (no card), but it's tied to your account, so it still stays **secret**.
 
-Wire it in safely:
+**Get a free key first:** [`MODEL-SETUP.md`](../skeleton/MODEL-SETUP.md) — a free
+OpenRouter account, an API key, and a `:free` model. Then wire it in safely:
 
 ```text
-Put the LLM API key in an environment variable in a .env file. Add .env to .gitignore so it is never committed. Read the key from the environment in code — never hardcode it.
+Put the OpenRouter API key in an OPENROUTER_API_KEY variable in a .env file. Add .env to .gitignore so it is never committed. Read the key from the environment in code — never hardcode it.
 ```
 
 `.env` holds the secret · `.gitignore` keeps it off GitHub.
@@ -169,10 +170,11 @@ Deploy to Vercel. Add the API key as an environment variable in the Vercel proje
 
 > **The key lives in Vercel's settings — never in the code you push.**
 
-**Cost awareness:** every chat message is a real **API call** that costs a little.
-It's separate from your Claude plan — keep an eye on it (see
-[`prep/claude-plans.md`](../../../prep/claude-plans.md)), and don't leave a public
-demo wide open if you're worried about spend.
+**Cost & limits:** every chat message is a real **API call**. On OpenRouter's free
+tier that's **~50 requests/day** per account (failed tries count) — plenty to build
+today. Hit the wall? Wait for the reset, switch `:free` model, or add **$10 of
+credits** for 1,000/day. It's separate from your Claude plan; details in
+[`MODEL-SETUP.md`](../skeleton/MODEL-SETUP.md).
 
 ---
 
@@ -195,9 +197,9 @@ Read the files in sample-persona/. Summarise what you know about this person so 
 Build a simple one-page web app with a chat box. When the user sends a message, call the LLM with the documents in sample-persona/ as context, and answer using ONLY that context. If the answer isn't there, say so.
 ```
 
-**Wire the API key safely**
+**Wire the API key safely** (free OpenRouter key — see `MODEL-SETUP.md`)
 ```text
-Put the LLM API key in an environment variable in a .env file. Add .env to .gitignore so it is never committed. Read the key from the environment in code — never hardcode it.
+Put the OpenRouter API key in an OPENROUTER_API_KEY variable in a .env file. Add .env to .gitignore so it is never committed. Read the key from the environment in code — never hardcode it.
 ```
 
 **Add the fit-assessment**

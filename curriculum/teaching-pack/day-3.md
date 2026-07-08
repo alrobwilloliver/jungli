@@ -64,11 +64,16 @@ ONLY that context. If the answer isn't there, say so.
 **Talking points:**
 - An **API** = asking another service (here, the AI model) to do something for you.
 - An **API key** = your password to that service. Keep it secret.
+- We use a **free OpenRouter model** — so the key is **free** (no cost barrier),
+  but the secret-handling is identical. Get one via `MODEL-SETUP.md`.
 - Store it in an **environment variable** / `.env`; add `.env` to `.gitignore`.
 - ⚠️ **The classic disaster:** committing a key to a public repo — what happens and
   why it's bad.
+- Name the **free-tier limit** out loud: ~50 requests/day per account (failed tries
+  count) — wait, switch `:free` model, or add $10 for 1,000/day.
 
-**Resources:** the model provider's API-key page · `.env` + `.gitignore` · this deck.
+**Resources:** [`chat-agent/skeleton/MODEL-SETUP.md`](../../projects/chat-agent/skeleton/MODEL-SETUP.md)
+(free OpenRouter key + `:free` model) · `.env` + `.gitignore` · this deck.
 
 **Practical task:** put your key in `.env`, confirm `.gitignore` excludes it, and
 wire the real call so the chat answers from the context.

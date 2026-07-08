@@ -67,6 +67,9 @@ and there are ways to keep costs down — below.
 ## What we recommend
 
 - **Most participants:** get **Pro** ($20) for the residency month. ✅
+- **No extra AI cost for Build 3:** the chat agent uses a **free OpenRouter model**,
+  so there's no paid model API key to buy — see
+  [`../projects/chat-agent/skeleton/MODEL-SETUP.md`](../projects/chat-agent/skeleton/MODEL-SETUP.md).
 - **If you already know you build intensely** (or you're doing back-to-back
   projects): consider **Max 5×** for the month, or start on Pro and enable
   usage credits as a safety net.

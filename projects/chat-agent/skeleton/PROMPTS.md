@@ -42,9 +42,13 @@ uses ONLY that context. If the answer isn't in the context, say so.
 
 ## 4. API key & secrets (the real lesson here)
 
+**First get a free key:** [`MODEL-SETUP.md`](MODEL-SETUP.md) walks you through a
+free **OpenRouter** account, an API key, and picking a `:free` model — so this
+costs nothing. Then wire it in safely:
+
 ```text
-Put the LLM API key in an environment variable in a .env file. Add .env to
-.gitignore so it is never committed. Read the key from the environment in code —
+Put the OpenRouter API key in an OPENROUTER_API_KEY variable in a .env file. Add
+.env to .gitignore so it's never committed. Read the key from the environment —
 never hardcode it.
 ```
 
@@ -66,5 +70,7 @@ settings (not in the code).
 ## 7. Guardrails
 
 - Answer **only** from context; if unknown, say so.
-- Each chat message calls the LLM — **watch token cost** (see `prep/claude-plans.md`).
+- Each chat message is a real **API call**. We use a **free OpenRouter model**
+  ([`MODEL-SETUP.md`](MODEL-SETUP.md)) — mind the **~50 requests/day** free limit
+  (add $10 of credits for 1,000/day if you need more).
 - Never commit real personal data or your API key.

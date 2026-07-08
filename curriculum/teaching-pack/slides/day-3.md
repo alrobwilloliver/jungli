@@ -142,9 +142,10 @@ Ask it about **Sam** — and try a question it *can't* know.
 
 - An **API** = asking another service (the AI model) to do something for you.
 - An **API key** = your **password** to that service.
-- Calling the model costs money — the key is tied to **your bill**.
+- We use a **free OpenRouter model** — free key, no card. Still **secret**:
+  it's tied to your account (**~50 messages/day** free).
 
-So it has to stay **secret**.
+Enough to build today — steps in `MODEL-SETUP.md`.
 
 ---
 
@@ -153,9 +154,9 @@ So it has to stay **secret**.
 ## Wire the key safely
 
 ```text
-Put the LLM API key in a .env file. Add .env to .gitignore
-so it's never committed. Read the key from the environment —
-never hardcode it.
+Put the OpenRouter API key in a .env file. Add .env to
+.gitignore so it's never committed. Read it from the
+environment — never hardcode it.
 ```
 
 `.env` holds the secret · `.gitignore` keeps it off GitHub.

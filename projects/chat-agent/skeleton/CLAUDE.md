@@ -7,8 +7,10 @@ Rules when building here:
 
 - The agent must answer **only from the provided context.** If something isn't in
   the context, it says so — it never invents facts about the person or product.
-- Keep the LLM **API key in an environment variable** (`.env`), add `.env` to
-  `.gitignore`, and **never hardcode or commit** the key.
+- The model is called via **OpenRouter's free tier** (OpenAI-compatible API at
+  `https://openrouter.ai/api/v1`) — see `MODEL-SETUP.md`. Keep the
+  **`OPENROUTER_API_KEY` in `.env`**, add `.env` to `.gitignore`, and **never
+  hardcode or commit** the key.
 - Keep the build simple and deployable to **Vercel**. Prefer the least machinery
   that works.
 - Support two modes:
