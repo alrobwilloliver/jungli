@@ -17,6 +17,13 @@ Reduce the answers into this sentence:
 
 `I help [audience] get [result] through [offer].`
 
+**Worked example — Andrea (the Day-1 demo):**
+
+> I help people stuck in a 9-to-5 get the freedom to live and work from
+> anywhere through a step-by-step digital nomad coaching program.
+
+See the finished page live: <https://email-capture-demo-live.vercel.app>
+
 ## 2. First Build Prompt
 
 ```text
