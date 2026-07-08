@@ -1,5 +1,16 @@
 # Slides — Build 3 (chat agent)
 
+**Learner handout:** [`workshop-guide.md`](workshop-guide.md) — the branded,
+step-by-step Day-3 take-home (what an app is · build the grounded chat · API keys
+& secrets · fit-assessment · deploy). Rendered to `workshop-guide.pdf` with the
+Jungli document theme:
+
+```bash
+npx md-to-pdf --stylesheet ../../../brand/theme/jungli-doc.css \
+  --pdf-options '{"printBackground":true,"format":"A4"}' \
+  projects/chat-agent/slides/workshop-guide.md
+```
+
 PPT slides for this build go here. Suggested beats to cover:
 
 1. What an app is (frontend / backend / data flow) — the un-mystical version.
