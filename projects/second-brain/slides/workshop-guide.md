@@ -34,7 +34,8 @@ agent while you do it. No coding needed.**
 
 > **What you'll need**
 > - The setup from Day 1 (the **Claude app**, Node, Git, a GitHub account). No new
->   installs — see [`prep/`](../../../prep/) if you're missing anything.
+>   installs — see [`prep/prerequisites.md`](../../../prep/prerequisites.md) if
+>   you're missing anything.
 > - **Some raw material** — your CV, a bio, project notes, or a few sentences about
 >   yourself. (Product notes work too if you're building for customers.)
 > - Your paid **Claude plan** (Pro, from $20/month).

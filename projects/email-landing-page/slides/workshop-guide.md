@@ -75,7 +75,7 @@ live and work from anywhere through a step-by-step digital nomad coaching progra
 
 Do this **before** the workshop, on good internet. You need four things — all free
 except the Claude plan. Full step-by-step for each is in the course
-[`prep/`](../../../prep/) guides ([Mac](../../../prep/setup-mac.md) ·
+[prep guides](../../../prep/prerequisites.md) ([Mac](../../../prep/setup-mac.md) ·
 [Windows](../../../prep/setup-windows.md)); here's the shape.
 
 ### 2.1 — The Claude desktop app
@@ -204,7 +204,7 @@ Please commit the current changes with a short, descriptive message.
 **Kit** (formerly ConvertKit) is a mailing-list tool with a free plan. For Day 1
 you'll use its **embed** — a drop-in snippet with **no API key, no secrets**.
 
-The full click-by-click is in **[`KIT-SETUP.md`](../KIT-SETUP.md)**. In short:
+The full click-by-click is in **[`KIT-SETUP.md`](../skeleton/KIT-SETUP.md)**. In short:
 
 1. Sign up free at **[kit.com](https://kit.com)**.
 2. **Grow → Landing Pages & Forms → + Create new → Form.** Save it.
