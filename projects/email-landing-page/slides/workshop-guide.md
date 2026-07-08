@@ -125,11 +125,7 @@ Here's the golden rule that keeps you out of trouble:
 So the very first move is to spin out your own copy. In the **Code** tab, paste:
 
 ```text
-Make a new folder called "my-landing-page" in my home directory — NOT inside the
-jungli course folder. Copy the starter files from the email-landing-page skeleton
-in the course repo into it. Then initialise a fresh git repo there and make a
-first commit ("Start my landing page"). Confirm we're now working in
-my-landing-page, not in the course repo.
+Make a new folder called "my-landing-page" in my home directory — NOT inside the jungli course folder. Copy the starter files from the email-landing-page skeleton in the course repo into it. Then initialise a fresh git repo there and make a first commit ("Start my landing page"). Confirm we're now working in my-landing-page, not in the course repo.
 ```
 
 Claude makes the folder, copies the starter (`CLAUDE.md`, `PROMPTS.md`,
@@ -181,12 +177,10 @@ each:
 Tighten the copy, make the CTA clearer, and simplify the layout.
 ```
 ```text
-Improve the page so it feels more credible and specific without adding
-unnecessary sections.
+Improve the page so it feels more credible and specific without adding unnecessary sections.
 ```
 ```text
-Make the design feel more polished while keeping the code simple and the layout
-easy to scan on mobile.
+Make the design feel more polished while keeping the code simple and the layout easy to scan on mobile.
 ```
 
 ### 4.4 — Save your progress
@@ -215,8 +209,7 @@ The full click-by-click is in **[`KIT-SETUP.md`](../KIT-SETUP.md)**. In short:
 4. Hand it to Claude Code:
 
 ```text
-Integrate this Kit form embed into the signup section cleanly, keeping the
-layout simple and responsive: [paste your <script> snippet].
+Integrate this Kit form embed into the signup section cleanly, keeping the layout simple and responsive: [paste your <script> snippet].
 ```
 
 5. **Test:** submit a real email on your page, then check **Grow → Subscribers**
@@ -236,8 +229,7 @@ internet automatically.
 Let Claude walk you through it:
 
 ```text
-Walk me through pushing this project to a new GitHub repo under my account, and
-tell me exactly what to click at each step.
+Walk me through pushing this project to a new GitHub repo under my account, and tell me exactly what to click at each step.
 ```
 
 *(First push? GitHub may ask you to sign in — a browser window opens, you log in,
@@ -245,8 +237,7 @@ done. It only happens once.)*
 
 ### 6.2 — Import to Vercel
 ```text
-Now walk me through importing this GitHub repo into Vercel so it goes live. Tell
-me exactly what to click.
+Now walk me through importing this GitHub repo into Vercel so it goes live. Tell me exactly what to click.
 ```
 
 The shape: **vercel.com → Add New → Project → import your repo → Deploy.** No build
@@ -293,9 +284,7 @@ Every prompt from this guide, in one place. Copy and customise.
 
 **Start your own project**
 ```text
-Make a new folder called "my-landing-page" in my home directory — NOT inside the
-jungli course folder. Copy the email-landing-page skeleton into it, start a fresh
-git repo, and confirm we're working there.
+Make a new folder called "my-landing-page" in my home directory — NOT inside the jungli course folder. Copy the email-landing-page skeleton into it, start a fresh git repo, and confirm we're working there.
 ```
 
 **First build**
@@ -313,18 +302,15 @@ Important: leave a clear placeholder for a Kit embedded form.
 Tighten the copy, make the CTA clearer, and simplify the layout.
 ```
 ```text
-Improve the page so it feels more credible and specific without adding
-unnecessary sections.
+Improve the page so it feels more credible and specific without adding unnecessary sections.
 ```
 ```text
-Make the design feel more polished while keeping the code simple and the layout
-easy to scan on mobile.
+Make the design feel more polished while keeping the code simple and the layout easy to scan on mobile.
 ```
 
 **Add the Kit form**
 ```text
-Integrate this Kit form embed into the signup section cleanly, keeping the
-layout simple and responsive: [paste your <script> snippet].
+Integrate this Kit form embed into the signup section cleanly, keeping the layout simple and responsive: [paste your <script> snippet].
 ```
 
 **Save a checkpoint**
@@ -334,8 +320,7 @@ Please commit the current changes with a short, descriptive message.
 
 **Go live**
 ```text
-Walk me through pushing this to a new GitHub repo under my account and importing
-it into Vercel so it's live. Tell me exactly what to click at each step.
+Walk me through pushing this to a new GitHub repo under my account and importing it into Vercel so it's live. Tell me exactly what to click at each step.
 ```
 
 ---
