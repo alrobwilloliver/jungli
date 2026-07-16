@@ -1,36 +1,35 @@
-# Weekend Day 1 (Saturday) — Ship a live site
+# Weekend Day 1 (Saturday) — Build it & own it
 
-*Full day · the most-mentored day of the weekend · Build: a **basic** personal
-landing page. Goal: everyone leaves with a real website live on the internet — no
-exceptions.*
+*Full day · the most-mentored day of the weekend · Build: a **booking / client-intake
+app** in Lovable, then pull it into Claude Code. Goal: everyone leaves with a working
+app running on their own machine, in code they own — no exceptions.*
 
-Projects: [`projects/email-landing-page`](../../projects/email-landing-page)
+Learner guide: [`weekend/saturday-build-and-own-your-first-app.md`](weekend/saturday-build-and-own-your-first-app.md)
+· Prompts: [`weekend/saturday-lovable-prompts.md`](weekend/saturday-lovable-prompts.md)
 
-> The taster version of the course's Day 1 — deliberately simpler (no email form
-> yet). Today's win is *"it's live, and it's mine."*
+> Today's story: **start in the easiest tool, then own your work.** The "own it"
+> move is why the whole 5-day course lives in Claude Code — today they feel why.
 
 ---
 
-## Lesson W1.1 — What is Claude Code, and the loop *(concept, ~20 min)*
+## Lesson W1.1 — Claude Code, the loop, and "own your work" *(concept, ~20 min)*
 
 **Talking points (slides):**
-- The AI you've used (ChatGPT) *answers questions*. **Claude Code** *does tasks* —
-  it reads and writes files on your computer and runs things for you. This weekend
-  it lives in the Claude app's **Code tab** (buttons, not a terminal).
-- **The one loop you'll use all weekend:** you ask → it makes a change → you look →
-  you refine. *You direct; it builds.*
-- It will sometimes get things wrong — that's normal, you just re-steer it. It's a
-  fast junior teammate that needs clear instructions, not magic.
-- **The "not technical enough" worry** — name it out loud. You will not write code
-  today. If you can describe what you want, you can build it. By tonight you'll have
-  proof.
+- Two kinds of AI tool: a **chatbot answers**; **Claude Code does tasks** — reads and
+  writes files, runs things, builds real software. This weekend it lives in the Claude
+  app's **Code tab** (buttons, not a terminal).
+- **The one loop you'll use all weekend:** ask → it builds → you look → you refine.
+- Today has two halves: **the magic** (build fast in a chat-based builder) and **the
+  point** (take it out and own it in Claude Code).
+- **Name the "not technical enough" fear.** You won't write code today. If you can
+  describe what you want, you can build it — and own it. Proof by tonight.
 
-**Resources:** this deck · the Claude app open on a new folder (Code tab).
+**Resources:** this deck · the Claude app open on a fresh folder (Code tab).
 
-**Practical task:** a 2-minute "say hello" to prove your setup works.
+**Practical task:** a 2-minute "say hello" in the Code tab to prove setup works.
 
-**Questions:** ① What's one thing Claude Code can do that a normal chatbot can't?
-② What are the four steps of the loop? ③ What do you do when it gets something wrong?
+**Questions:** ① What can Claude Code do that a chatbot can't? ② What are the four
+steps of the loop? ③ In a sentence: why *own* your work instead of leaving it in a builder?
 
 **Base prompt:**
 ```
@@ -39,69 +38,66 @@ Create a file called hello.txt that says hello, then tell me what you just did a
 
 ---
 
-## Lesson W1.2 — Build a basic personal site *(demo + guided build, ~50 min)*
+## Lesson W1.2 — The magic: build a booking app in Lovable *(demo + guided build, ~50 min)*
 
 **Talking points:**
-- Decide the **one thing** the page is about first: who you are, and what you want a
-  visitor to know. Keep it small.
-- Watch me build one from a single prompt — then you build yours.
-- **Reading what it made:** the page, the files, Accept/Reject on each change.
-- **Make it yours:** your words, your colours — ask for small changes and watch them happen.
-- *No email form today — that's the course version. Today = simple and live.*
+- Demo Lovable live: describe a **booking / client-intake app** in the chat box →
+  watch it build a *full-stack* app (form → database → dashboard) → it's live on a
+  `*.lovable.app` URL in minutes. (Instructor's demo can be a *real* tool — e.g. taking
+  signups for the 5-day course.)
+- Point out what's special: it built a **backend and a database**, not just a page.
+- **Let them feel the credit meter** — free tier is a few credits/day. That feeling is
+  the setup for W1.3 (*why* we own it).
+- Then they build their own, following the prompt guide. Booking/intake is the default;
+  a lead tracker / feedback collector / event RSVP are fine variations.
 
-**Resources:** [`email-landing-page/skeleton/PROMPTS.md`](../../projects/email-landing-page/skeleton/PROMPTS.md)
-(use the simple build prompt below) · the [`finished/`](../../projects/email-landing-page/finished) reference for ideas.
+**Resources:** [`weekend/saturday-lovable-prompts.md`](weekend/saturday-lovable-prompts.md)
+· a free Lovable account.
 
-**Practical task:** build your own one-page personal site; change at least the
-headline, one section, and one colour.
+**Practical task:** build your own booking/intake app in Lovable; get it live on a
+`*.lovable.app` URL; make one styling change.
 
-**Questions:** ① In one line, what's your page about? ② What's one change you asked
-for that worked — and one that didn't the first time?
+**Questions:** ① What did Lovable build *besides* the page? ② What happened to your
+credits as you built? ③ In one line, what's your app for?
+
+**Base prompts:** see the prompt guide (main build → look-and-feel → refine).
+
+---
+
+## Lesson W1.3 — Graduate it: own the code in Claude Code *(concept + do, ~40 min)*
+
+**Talking points:**
+- **The catch:** metered credits, a platform you don't control, vendor lock-in. Show
+  the lock-in for real if you can (a synced Lovable project restricts even cleaning your
+  own git history until you disconnect) — a tool that limits what you can do to your own
+  work is one to be able to walk away from.
+- **The graduation:** Lovable **GitHub-sync** → your codebase lands in *your* repo →
+  pull it **local** → open and run in **Claude Code**. *You own the code now.*
+- Two real things they'll hit: it runs with **Bun** (Claude handles it), and it often
+  **just runs** because Lovable includes the settings.
+- **The one safety habit:** secrets stay out of git. Lovable sometimes commits `.env`;
+  today it's harmless, which makes it the perfect moment to build the habit.
+- **The lesson:** builders are a great *on-ramp*; **Claude Code is where you own and grow.**
+
+**Resources:** a GitHub account · the Claude app (Code tab) · the learner guide §3–4.
+
+**Practical task:** GitHub-sync your Lovable app → clone it into Claude Code → run it
+locally → fix the `.env` habit → confirm it's running on `localhost`.
+
+**Questions:** ① What are two reasons to own the code instead of staying in Lovable?
+② Where do secrets belong — and where do they *never* belong? ③ What does "it's yours"
+let you do that Lovable didn't?
 
 **Base prompts:**
 ```
-Build me a simple one-page personal website with plain HTML and CSS.
-Include: my name and a short tagline, a short "about me" paragraph, a list of
-3 things I've done or care about, and a footer with my email.
-Make it clean, mobile-friendly, and easy to change. Keep the code simple.
+Clone my GitHub repo [URL] into a new folder in my home directory, install its dependencies, and run it locally so I can see it. Tell me if it needs any environment variables.
 ```
 ```
-Change the headline to "[your words]" and make the colours warmer. Show me the
-result and wait for my OK before doing anything else.
+Is my .env tracked by git? If so, stop tracking it (keep my local copy), add it to .gitignore, and commit. Explain why in one line.
 ```
 
 ---
 
-## Lesson W1.3 — Save it & put it live: git + Vercel *(concept + do, ~40 min)*
-
-**Talking points:**
-- **Save points:** you never lose work, and you can always go back.
-- **Git** = local save points (commits). **GitHub** = your work, online and backed up.
-- **Deploy** = put it on the internet. **Vercel** publishes your GitHub repo and
-  gives you a live link.
-- The flow: **commit → push to GitHub → import to Vercel → live URL.**
-- Your live link is shareable — text it to someone. 🎉
-
-**Resources:** a GitHub account · a Vercel account · the Claude app (it runs the git
-steps for you) · `vercel.com`.
-
-**Practical task:** commit your page, push to GitHub, deploy on Vercel, and share
-your **live URL** in the group chat.
-
-**Questions:** ① What's a commit, in your words? ② What does Vercel do for you?
-③ Where do you find your live link again?
-
-**Base prompts:**
-```
-Initialise git in this project and commit everything with the message
-"My first site". Explain each step simply as you go.
-```
-```
-Walk me through pushing this to a new GitHub repo and connecting it to Vercel so
-it's live. Tell me exactly what to click at each step.
-```
-
----
-
-**End of Day 1 — you leave with:** a basic personal site **live on a real URL**, and
-a feel for the core loop. Tomorrow: give Claude a memory.
+**End of Day 1 — they leave with:** a booking app live on Lovable *and* running in
+Claude Code on their own machine, plus a real grasp of *why* you own your work.
+Tomorrow: make it fully yours and grow it.

@@ -1,106 +1,103 @@
-# Weekend Day 2 (Sunday) — Give Claude a memory
+# Weekend Day 2 (Sunday) — Make it yours & grow it
 
-*Shared cross-track day · partial instructor time (runs from a ready starter) ·
-Build: a **second-brain starter** (lite). Goal: the "it actually knows my stuff"
-moment — feel how an AI uses context.*
+*Shared cross-track day · partial instructor time (runs from a ready guide) · Build:
+give the app a memory, own the backend, add an email feature, deploy it. Goal: turn
+"I own the code" into "I own the whole thing and shipped it."*
 
-Projects: [`projects/second-brain`](../../projects/second-brain)
+Learner guide: [`weekend/sunday-grow-your-app.md`](weekend/sunday-grow-your-app.md)
 
-> Yesterday was *output* — you made a thing and shipped it. Today is *input* — how
-> you give an AI a memory by handing it your own files.
+> Yesterday was *get it & own the code*. Today is *drive it & grow it* — and ship.
+> **Pace note:** the deep parts (backend, email, deploy) are **instructor-demoed**;
+> the guaranteed learner outcome is a `CLAUDE.md`, one real change, and a live URL.
+> Nobody leaves stuck.
 
 ---
 
-## Lesson W2.1 — It only knows what you give it *(concept + demo, ~20 min)*
+## Lesson W2.1 — Give your app a memory: `CLAUDE.md` *(concept + demo, ~20 min)*
 
 **Talking points (slides):**
-- An AI has no idea who *you* are — unless you tell it. **Context** = the stuff you
-  give it to work from.
-- The trick: put what you know into **files**, and point Claude at them. If it's not
-  in a file, the agent can't use it.
-- *Demo:* ask Claude a question about you with no notes (it guesses or declines) →
-  give it one note → ask again (now it answers). Same question, different context.
-- A **"second brain"** is just a tidy folder of those notes. That's the whole idea —
-  and it's the foundation everything else (chat agents, bigger projects) is built on.
+- An AI only knows what's in front of it. **Context** = what you give it to work from.
+- A **`CLAUDE.md`** is the app's standing instructions — a note Claude Code reads
+  *every time*: what the app is, how it's built, how you like to work.
+- *Demo:* ask Claude to write a `CLAUDE.md` for yesterday's app → read it → point out
+  it now "remembers" the project on every future session.
+- This is the **context & memory** idea — the foundation everything else in AI is built
+  on — made real on *their own* app.
 
-**Resources:** this deck · the Claude app · [`second-brain/skeleton`](../../projects/second-brain/skeleton).
+**Resources:** this deck · the Claude app on yesterday's project.
 
-**Practical task:** write 4–6 plain sentences about yourself in a note; ask Claude a
-question before and after it can see them.
+**Practical task:** have Claude write a `CLAUDE.md` for your app; read it and correct
+one thing.
 
-**Questions:** ① What is "context" in your own words? ② Why does putting things in
-files matter? ③ What should the agent do if the answer isn't in your notes?
-
-**Base prompt:**
-```
-Here are a few sentences about me: [paste]. Read them, then answer
-"what should someone know about me first?" using only what I gave you.
-```
-
----
-
-## Lesson W2.2 — Build your second brain *(guided build, ~40 min)*
-
-**Talking points:**
-- **Atomic notes:** one idea per file, a clear title.
-- **Link them** with `[[double brackets]]` so related ideas connect.
-- Keep an **`index.md`** that lists and groups the notes.
-- Ask it questions — and notice it answers **only** from your vault, and says so when
-  something's missing. That honesty is the point.
-
-**Resources:** [`second-brain/skeleton/PROMPTS.md`](../../projects/second-brain/skeleton/PROMPTS.md)
-(the **Weekend lite path**) · the [`finished/`](../../projects/second-brain/finished) Sam Rivera vault for shape.
-
-**Practical task:** turn your sentences into a few linked notes + an index; then ask
-your brain 3 real questions.
-
-**Questions:** ① Why one idea per note? ② What makes a good `[[link]]`?
-
-**Base prompts (from `PROMPTS.md` → Weekend lite path):**
-```
-Here are a few sentences about me: [paste]. Turn them into a few short markdown
-notes in a vault/ folder — one idea per file, clear titles, with [[links]] between
-related notes. Then make vault/index.md that lists them.
-```
-```
-Using ONLY the notes in vault/, answer this: [a question about you]. If it isn't in
-the notes, tell me what's missing instead of guessing.
-```
-
----
-
-## Lesson W2.3 — See it & grow it: Obsidian *(optional, guided, ~30 min)*
-
-*The buffer track — for anyone who finishes the core build early. Turns a short
-session into a full one, and gives you time to spend with whoever's stuck.*
-
-**Talking points:**
-- Your notes are **just files** — and they open beautifully in **Obsidian**, a free
-  notes app, with a **graph view** that draws every note and link.
-- Same folder, two windows: Claude writes the notes, Obsidian shows them. Nothing
-  hidden — that's the lesson.
-- **Grow your brain:** add a few more linked notes, refresh the index, give Claude a
-  short standing-instructions file, and ask harder questions across notes — watch the
-  graph fill in.
-
-**Resources:** [`second-brain/OBSIDIAN.md`](../../projects/second-brain/OBSIDIAN.md)
-(full walkthrough) · [obsidian.md](https://obsidian.md) (free).
-
-**Practical task:** open your vault in Obsidian, turn on graph view, then add and link
-two more notes and watch the graph grow.
-
-**Questions:** ① What does the graph view show you? ② Name one way giving Claude
-standing instructions (a `CLAUDE.md`) helps.
+**Questions:** ① What is "context" in your own words? ② What does a `CLAUDE.md` save
+you from repeating? ③ Name one rule you'd put in yours.
 
 **Base prompt:**
 ```
-Add two more atomic notes to vault/ about [an interest] and [a project], link them
-to the right existing notes with [[links]], and update vault/index.md.
+Write a CLAUDE.md for this project: what it is, its stack, how to run it, key files, and rules for working in it. Keep it short and clear.
 ```
 
 ---
 
-**End of Day 2 — you leave with:** your own second-brain starter, a real feel for how
-AI uses context, and (if you did the Obsidian track) a living map of your own
-knowledge. Continuing into the course? This is exactly what Day 2 grows into a full
-vault — and Day 3 turns into a chat agent.
+## Lesson W2.2 — Own the backend & grow it: add booking emails *(guided build, ~45 min)*
+
+**Talking points:**
+- **Own the backend too.** Yesterday they owned the code; the *database* may still be on
+  the builder's managed platform. Demo moving it to their **own Supabase** (the app
+  carries its schema in a `migrations` folder, so it's a rebuild, not a rewrite).
+  *(Optional for learners — instructor demos; slower rooms can keep the managed backend.)*
+- **Grow it:** add **"email me when someone books"** — a server-side function + **Resend**
+  (free). The booking already saves; this adds the notification.
+- **Secrets, grown-up version:** the Resend key is a *real* secret → it lives **server-side**
+  (a function secret), never in the app's `.env` or git. Same habit as Saturday, one level up.
+- **Deliverability reality:** first emails often hit **Spam** — mark "Not spam," it learns.
+
+**Resources:** the learner guide §2–3 · free Supabase + Resend accounts.
+
+**Practical task (guided):** add the email feature; send yourself a test booking email.
+*(If backend-porting stalls, keep the managed backend and still add the feature.)*
+
+**Questions:** ① Why own the backend, not just the code? ② Where does a real API key
+live — and where must it never? ③ Why did the first email hit spam?
+
+**Base prompt:**
+```
+When someone submits the booking form, email me the details. Use Resend and a server-side function; keep the API key as a server-side secret, never in the browser or git. One step at a time.
+```
+
+---
+
+## Lesson W2.3 — Debug with logs, then deploy *(concept + do, ~35 min)*
+
+**Talking points:**
+- **When it's quiet, get the log.** The best debugging lesson of the weekend: don't
+  guess — every step leaves a trail. For the email: the **webhook log** (did the booking
+  trigger the function, what did it return?) and **Resend's log** (sent? delivered?
+  bounced?). Nine times in ten the log turns a mystery into a one-line fix.
+- **Deploy it as yours:** **Vercel** publishes the app from *their* GitHub → a live URL
+  they control, that **redeploys on every push**. Optional custom domain for anyone who
+  owns one (instructor's demo shows the branded version).
+- **Close the loop:** they built it, own it, grew it, and shipped it — the whole craft.
+
+**Resources:** the learner guide §4–5 · a Vercel account.
+
+**Practical task:** deploy your app to your own Vercel URL; share it in the group chat.
+(Stretch: read the webhook/Resend logs to confirm your email fired.)
+
+**Questions:** ① When something's silent, what do you do *instead of guessing*? ② What
+does Vercel do on every future push? ③ What's the difference between your Lovable URL
+(Saturday) and your Vercel URL (today)?
+
+**Base prompts:**
+```
+The email isn't arriving. Don't guess — help me check the logs: did the booking trigger the function, what did it return, and did Resend send it? Then fix what the logs show.
+```
+```
+Deploy this app to Vercel on my account: connect my GitHub repo, set the environment variables, and give me a live URL. Tell me what to click.
+```
+
+---
+
+**End of Day 2 — they leave with:** a fully-owned app (code + backend), an email feature
+they added, live on their own URL — and the instinct to read the log. Continuing into
+the course? This is exactly what the week is, on bigger builds.

@@ -20,10 +20,10 @@ in my-second-brain, not in the course repo.
 
 You'll push this to your *own* new GitHub repo later. It stays yours.
 
-## Weekend lite path (taster Day 2)
+## Quick start — from a few sentences
 
-On the 2-day weekend taster? **Start here** — a gentler version of the full flow
-below. You don't need a CV; a few sentences about yourself is plenty.
+New to this? **Start here** — a gentler version of the full flow below. You don't
+need a CV; a few sentences about yourself is plenty.
 
 **1. Capture (from a few sentences):**
 ```text

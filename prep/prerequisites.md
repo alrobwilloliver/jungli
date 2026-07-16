@@ -45,6 +45,8 @@ Both guides walk you through:
 2. **Node.js** — one free tool that lets the websites/apps you build actually run.
 3. **Git + a GitHub account** — your "save points" and where your work goes online.
 4. **A Vercel account** — where you'll publish your site to a real, live URL.
+5. **Weekend taster only — a free [Lovable](https://lovable.dev) account** — the
+   chat-based app builder you start with on Saturday. *(Not needed for the 5-day course.)*
 
 Each guide ends by having you **paste one setup prompt into the Claude app**
 ([`setup-prompt.md`](setup-prompt.md)) — Claude then checks everything is working
@@ -57,6 +59,7 @@ You're ready for Day 1 when:
 - [ ] You can open the **Code** tab in the app (it won't ask you to upgrade)
 - [ ] **Node.js** is installed (the setup prompt confirms this)
 - [ ] You can sign in to **github.com** and **vercel.com**
+- [ ] *(Weekend taster only)* You can sign in to **lovable.dev**
 - [ ] You ran the **setup prompt** and Claude created your test file
 
 ### How you'll work with the course files

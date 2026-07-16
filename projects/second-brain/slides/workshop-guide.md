@@ -8,10 +8,10 @@ subtitle: "Jungli · AI & Agents · Build 2 (Day 2)"
 **Turn your notes into a folder your AI can think with — and learn to *drive* the
 agent while you do it. No coding needed.**
 
-> **📘 5-day course handout · Build 2.** This is the full course version. On the
-> **weekend taster**? Sunday builds a *lighter* second brain from a few sentences
-> (no CV needed) — see the "Weekend lite path" in
-> [`PROMPTS.md`](../skeleton/PROMPTS.md) and follow your weekend guide.
+> **📘 5-day course handout · Build 2.** This is the full course version. *(The
+> weekend taster no longer covers the second brain — it's now a standalone track
+> about building and owning an app; see
+> [`curriculum/weekend-foundation.md`](../../../curriculum/weekend-foundation.md).)*
 
 > Day 1 got you a live site. Day 2 goes deeper: you'll learn how the agent
 > actually "sees" your work (tokens & context), how to brief, plan, and debug it

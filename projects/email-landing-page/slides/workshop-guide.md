@@ -9,8 +9,9 @@ subtitle: "Jungli · AI & Agents · Build 1"
 Code. No coding experience needed.**
 
 > **📘 5-day course handout · Build 1.** This is the full course version, *with*
-> email capture (Kit). On the **weekend taster**? Saturday builds a simpler
-> personal site with **no email form** — follow your weekend guide instead.
+> email capture (Kit). The **weekend taster** is a *different* track — it builds a
+> booking app in Lovable and is all about owning your work — so if that's you,
+> follow the [weekend guides](../../../curriculum/weekend-foundation.md) instead.
 
 > You'll drive an AI agent in plain English. It writes the files; you stay in
 > charge. By the end you'll have a real website on the internet with a working
