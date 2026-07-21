@@ -20,3 +20,6 @@ curriculum/teaching-pack/slides/*.pdf
 node_modules/
 .env
 .env.local
+
+# Local Jungli marketing video studio — footage, editing code, and renders
+/video-studio/
