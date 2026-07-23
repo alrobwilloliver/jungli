@@ -4,6 +4,9 @@
 # Local Claude Code settings (machine-specific, not shared)
 .claude/settings.local.json
 
+# Isolated Superpowers implementation worktrees
+.worktrees/
+
 # Applicant PII — raw export + per-respondent detail. Keep local only.
 # The sanitised, aggregates-only extract lives in source/survey-responses.md
 source/*.xlsx
