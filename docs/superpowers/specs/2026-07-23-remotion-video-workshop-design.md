@@ -80,6 +80,8 @@ projects/remotion-video-workshop/
 │   ├── caterpillar.mp4
 │   ├── deer.mp4
 │   └── snake.mp4
+├── assets/
+│   └── captions.json
 ├── reference/
 │   ├── README.md
 │   ├── package.json
@@ -101,22 +103,43 @@ The reference project is the cleaned, reproducible source of the working nature
 demo. It excludes `node_modules`, build output, Whisper binaries/models,
 intermediate WAV files, and full-resolution local renders.
 
+The implementation sources are the existing ignored local demo:
+
+- Project source: `video-studio/nature-demo/`
+- Talking head: `video-studio/nature-demo/public/media/talking-head.MOV`
+- Caterpillar: `video-studio/nature-demo/public/media/caterpillar.MOV`
+- Deer: `video-studio/nature-demo/public/media/deer.MOV`
+- Snake: `video-studio/nature-demo/public/media/snake.MOV`
+- Corrected captions:
+  `video-studio/nature-demo/src/data/captions.json`
+- Verified full render:
+  `video-studio/nature-demo/renders/final/jungli-nature-demo.mp4`
+
 ## Media strategy
 
 The original local sources and render exceed GitHub's normal per-file limits.
 Create visually faithful H.264/AAC workshop proxies from the four originals.
 Each tracked file must stay below 100 MB, and the total should remain reasonable
-for a workshop clone. Preserve portrait orientation, audio on the talking-head
-clip, and enough quality for a 1080×1920 render.
+for a workshop clone. Encode portrait H.264 MP4 proxies at 720×1280, 30fps,
+`yuv420p`, CRF 23, with AAC audio at 128 kbps on the talking head; B-roll proxies
+have no audio. Preserve full source duration and use `faststart`. If any proxy
+still exceeds 95 MB, increase CRF only enough to bring it below that ceiling.
 
 Include a compact reference MP4 so learners can see the intended outcome without
-rendering first. The learner project copies media into `public/media`; the
-reference implementation must clearly document the same step.
+rendering first. Generate it from the verified full render at 720×1280, 30fps,
+H.264 CRF 25, AAC 96 kbps, and `faststart`; keep it below 95 MB. The learner
+project copies media into `public/media`; the reference implementation must
+clearly document the same step.
 
 ## Core versus extension path
 
 The reliable core path uses the supplied, corrected `Caption[]` JSON so every
 learner can finish without waiting for a model download or native compilation.
+Track its source of truth at
+`projects/remotion-video-workshop/assets/captions.json`, copied unchanged from
+the existing demo. During setup, the learner copies it to
+`src/data/captions.json`; the reference project includes that same file at that
+path and imports it directly.
 
 An optional extension regenerates captions locally with Remotion's supported
 Whisper tooling. The guide makes the download size, setup time, and possible
