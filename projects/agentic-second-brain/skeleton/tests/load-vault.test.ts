@@ -3,9 +3,22 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { loadVault } from "@/lib/vault/load-vault";
+
+const fsMock = vi.hoisted(() => ({
+  actualReadFile:
+    undefined as unknown as typeof import("node:fs/promises").readFile,
+  readFile: vi.fn(),
+}));
+
+vi.mock("node:fs/promises", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs/promises")>();
+  fsMock.actualReadFile = actual.readFile;
+  fsMock.readFile.mockImplementation(actual.readFile);
+  return { ...actual, readFile: fsMock.readFile };
+});
 
 const fixtureRoots: string[] = [];
 const makeVault = async () => {
@@ -17,6 +30,8 @@ const sampleVault = fileURLToPath(new URL("../vault", import.meta.url));
 
 describe("loadVault", () => {
   afterEach(async () => {
+    fsMock.readFile.mockReset();
+    fsMock.readFile.mockImplementation(fsMock.actualReadFile);
     await Promise.all(
       fixtureRoots.splice(0).map((root) => rm(root, { recursive: true })),
     );
@@ -31,8 +46,8 @@ describe("loadVault", () => {
       [
         "---",
         "title: Zeta launch",
-        "summary: A launch note.",
-        "tags: [launch, growth]",
+        'summary: "  A launch note.  "',
+        'tags: [" launch ", " ", growth, 42]',
         "---",
         "Launch body.",
       ].join("\n"),
@@ -108,7 +123,29 @@ describe("loadVault", () => {
     ]);
   });
 
-  test("does not follow file or directory symlinks", async () => {
+  test("isolates an expected per-note read error", async () => {
+    const root = await makeVault();
+    await writeFile(path.join(root, "unreadable.md"), "# Unreadable");
+    fsMock.readFile.mockRejectedValueOnce(
+      Object.assign(new Error("Permission denied"), { code: "EACCES" }),
+    );
+
+    await expect(loadVault(root)).resolves.toEqual([]);
+  });
+
+  test.each([
+    ["a systemic filesystem error", "EMFILE"],
+    ["an unexpected read error", undefined],
+  ])("propagates %s", async (_description, code) => {
+    const root = await makeVault();
+    await writeFile(path.join(root, "note.md"), "# Note");
+    const error = Object.assign(new Error("Unexpected read failure"), { code });
+    fsMock.readFile.mockRejectedValueOnce(error);
+
+    await expect(loadVault(root)).rejects.toBe(error);
+  });
+
+  test("does not follow file or directory symlinks", async (context) => {
     const root = await makeVault();
     const outside = await makeVault();
     await writeFile(path.join(outside, "secret.md"), "# Outside");
@@ -122,7 +159,7 @@ describe("loadVault", () => {
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code;
       if (code === "EPERM" || code === "EACCES" || code === "ENOSYS") {
-        return;
+        context.skip();
       }
       throw error;
     }

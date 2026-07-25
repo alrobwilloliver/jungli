@@ -5,8 +5,27 @@ import matter from "gray-matter";
 
 import type { VaultNote } from "./types";
 
+const isolatedNoteReadErrorCodes = new Set(["EACCES", "ENOENT", "EPERM"]);
+
 const firstHeading = (body: string) =>
   body.match(/^#\s+(.+?)\s*$/m)?.[1]?.trim();
+
+const isIsolatedNoteReadError = (error: unknown) => {
+  const code = (error as NodeJS.ErrnoException)?.code;
+  return typeof code === "string" && isolatedNoteReadErrorCodes.has(code);
+};
+
+const isMalformedFrontMatterError = (error: unknown) =>
+  error instanceof Error && error.name === "YAMLException";
+
+const normalizeTags = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((tag): tag is string => typeof tag === "string")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+};
 
 async function findMarkdownFiles(
   root: string,
@@ -40,42 +59,44 @@ export async function loadVault(
 
   for (const segments of files) {
     const relativePath = segments.join("/");
+    let source: string;
 
     try {
-      const source = await readFile(
-        path.join(resolvedRoot, ...segments),
-        "utf8",
-      );
-      const parsed = matter(source);
-      const body = parsed.content;
-      const frontMatterTitle =
-        typeof parsed.data.title === "string" && parsed.data.title.trim()
-          ? parsed.data.title.trim()
-          : undefined;
-      const title =
-        frontMatterTitle ??
-        firstHeading(body) ??
-        path.basename(segments.at(-1)!, ".md");
-      const summary =
-        typeof parsed.data.summary === "string" ? parsed.data.summary : "";
-      const tags = Array.isArray(parsed.data.tags)
-        ? parsed.data.tags.filter(
-            (tag: unknown): tag is string => typeof tag === "string",
-          )
-        : [];
-
-      notes.push({
-        path: relativePath,
-        title,
-        folder: segments.length === 1 ? "." : segments.slice(0, -1).join("/"),
-        summary,
-        tags,
-        body,
-        characterCount: body.length,
-      });
-    } catch {
-      // A malformed or unreadable note should not make the whole vault unusable.
+      source = await readFile(path.join(resolvedRoot, ...segments), "utf8");
+    } catch (error) {
+      if (isIsolatedNoteReadError(error)) continue;
+      throw error;
     }
+
+    let parsed: matter.GrayMatterFile<string>;
+    try {
+      parsed = matter(source);
+    } catch (error) {
+      if (isMalformedFrontMatterError(error)) continue;
+      throw error;
+    }
+
+    const body = parsed.content;
+    const frontMatterTitle =
+      typeof parsed.data.title === "string" && parsed.data.title.trim()
+        ? parsed.data.title.trim()
+        : undefined;
+    const title =
+      frontMatterTitle ??
+      firstHeading(body) ??
+      path.basename(segments.at(-1)!, ".md");
+    const summary =
+      typeof parsed.data.summary === "string" ? parsed.data.summary.trim() : "";
+
+    notes.push({
+      path: relativePath,
+      title,
+      folder: segments.length === 1 ? "." : segments.slice(0, -1).join("/"),
+      summary,
+      tags: normalizeTags(parsed.data.tags),
+      body,
+      characterCount: body.length,
+    });
   }
 
   return notes.sort((left, right) =>
