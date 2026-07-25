@@ -39,7 +39,7 @@ The skill succeeds when it enables Alan or another consultant to:
 - Identify and quantify operational bottlenecks from the prospect's evidence.
 - Deeply map the one or two processes most likely to produce value.
 - Distinguish verified facts, client estimates, and consultant assumptions.
-- Rank three grounded AI opportunities transparently.
+- Rank up to three grounded AI opportunities transparently.
 - Recommend one suitably narrow implementation sprint.
 - Produce a concise one-page snapshot that the prospect can understand.
 
@@ -165,10 +165,11 @@ The skill must:
    tools, constraints, and direct evidence.
 3. Reconstruct the current state of the strongest candidate processes.
 4. Identify missing information that materially affects a recommendation.
-5. Generate candidate interventions, including non-AI process improvements.
+5. Generate candidate interventions, including non-AI process improvements
+   that may be prerequisites for an AI implementation.
 6. Reject candidates that are unsupported, unsafe, uneconomic, or unlikely to
    be adopted.
-7. Score the remaining candidates and select the top three.
+7. Score the remaining AI candidates and select up to three.
 8. Recommend one first implementation sprint.
 9. Render the one-page opportunity snapshot.
 
@@ -198,12 +199,40 @@ Score each factor from 1–5:
 | Time to value | Speed at which a useful result can be tested |
 | Evidence confidence | Strength of the supplied facts and quantities |
 | Adoption fit | Likelihood that the owner and team will use the workflow |
-| Risk | Privacy, reliability, customer, legal, and oversight exposure |
+| Risk control | Strength of privacy, reliability, customer-impact, and oversight controls; 5 means low or well-controlled risk |
 
-The scoring reference must define anchors for 1, 3, and 5, a transparent
-calculation, and any risk penalty. Display both the total and the component
-scores. A total must never override a critical safety, privacy, or human-control
-concern.
+Calculate the priority score as:
+
+```text
+20 × (
+  0.30 × business value
+  + 0.20 × feasibility
+  + 0.15 × time to value
+  + 0.15 × evidence confidence
+  + 0.10 × adoption fit
+  + 0.10 × risk control
+)
+```
+
+Round the result to the nearest whole number. This produces a score from
+20–100. The scoring reference must define anchors for 1, 3, and 5 for every
+factor. Display both the total and all component scores.
+
+Treat any of the following as an unresolved critical concern:
+
+- The workflow requires personal or sensitive data without confirmed authority,
+  consent, minimization, and appropriate access controls.
+- It can create a consequential customer or professional outcome without
+  meaningful human verification or recourse.
+- Materially unreliable output cannot be detected before it causes the stated
+  harm.
+- Implementation would violate a stated client, contractual, or operational
+  constraint.
+
+An opportunity with an unresolved critical concern cannot appear in the ranked
+recommendations, regardless of its score. It may be reconsidered only when the
+proposed implementation sprint explicitly validates and resolves the concern
+before operational use.
 
 Savings estimates must show their inputs, formula, period, and confidence.
 Label each input as verified fact, client estimate, or consultant assumption.
@@ -215,15 +244,21 @@ The Markdown snapshot contains:
 
 1. **Desired outcome** — one clear sentence in the prospect's language.
 2. **What we heard** — three to five evidence-based observations.
-3. **Top three opportunities** — current problem, future workflow, human role,
-   expected benefit, assumptions, confidence, score, and indicative
-   complexity.
+3. **Top AI opportunities** — up to three recommendations covering the current
+   problem, future workflow, human role, expected benefit, assumptions,
+   confidence, score, and indicative complexity.
 4. **Recommended implementation sprint** — one bounded project, the expected
    outcome, what must be validated, and why it is first.
 5. **Next step** — a calm invitation to scope and price the sprint.
 
-Keep it to a genuinely scannable one-page equivalent. Put unresolved questions
+Keep it to a genuinely scannable one-page equivalent: target 500–700 words and
+do not exceed 750 words, excluding short table labels. Put unresolved questions
 next to the affected recommendation rather than hiding them.
+
+Non-AI process improvements do not occupy the ranked AI opportunity slots.
+Show a necessary process improvement as a prerequisite beside the affected
+opportunity. When fewer than three AI opportunities are defensible, return
+fewer than three and explain why; never pad the snapshot with weak ideas.
 
 ## Skill structure
 
@@ -234,6 +269,10 @@ consulting/auditing-service-businesses/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
+├── evals/
+│   ├── scenarios.md
+│   ├── baseline-results.md
+│   └── skill-results.md
 ├── references/
 │   ├── interview-guide.md
 │   ├── transcript-analysis.md
@@ -246,7 +285,8 @@ consulting/auditing-service-businesses/
 `SKILL.md` coordinates the prepare, conduct, and analyse modes. Detailed
 questions, extraction rules, and scoring anchors belong in references so the
 main skill remains concise. Assets are output templates, not explanatory
-documentation.
+documentation. `evals/` preserves the pressure scenarios, observed baseline
+failures, and post-skill results; runtime instructions do not load it.
 
 Initialize the folder using the standard skill creation tooling and validate
 its metadata after implementation. The skill remains owned by this repository;
@@ -269,11 +309,33 @@ optional future action.
 - Do not describe the output as a security, privacy, legal, or compliance
   audit.
 
+Apply these explicit gates:
+
+- **Consent unconfirmed:** stop transcript analysis and ask the consultant to
+  confirm authorized transcription or provide consent-safe notes instead.
+- **Sensitive data present:** do not reproduce it in outputs. Continue only
+  after the consultant confirms authorized handling and either supplies a
+  minimized/redacted source or explicitly confirms that the supplied source is
+  appropriate to process.
+- **Evidence inadequate:** do not create a ranked snapshot or savings claim.
+  Return an insufficient-evidence note listing the missing follow-up questions.
+- **Evidence adequate for only some candidates:** produce a limited snapshot
+  containing only the defensible opportunities, clearly marked with their
+  confidence and unresolved questions.
+
+An opportunity is eligible for scoring only when the evidence establishes its
+business problem, affected process, current workflow, meaningful frequency or
+impact, and relevant constraints. Missing monetary data prevents a monetary ROI
+claim but does not prevent a well-supported time or qualitative benefit.
+
 ## Validation
 
 Skill development follows a documentation TDD cycle. Before writing the skill,
-run realistic audit tasks without it and record the baseline failures. Then
-run equivalent tasks with the skill and close demonstrated gaps.
+run realistic audit tasks without it and record the baseline failures in
+`evals/baseline-results.md`. Then run equivalent tasks with the skill, record
+the results in `evals/skill-results.md`, and close demonstrated gaps. Store the
+reusable prompts, input transcripts, and pass/fail rubric in
+`evals/scenarios.md`.
 
 Use at least these scenarios:
 
