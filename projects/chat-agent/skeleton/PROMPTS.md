@@ -43,13 +43,16 @@ uses ONLY that context. If the answer isn't in the context, say so.
 ## 4. API key & secrets (the real lesson here)
 
 **First get a free key:** [`MODEL-SETUP.md`](MODEL-SETUP.md) walks you through a
-free **OpenRouter** account, an API key, and picking a `:free` model — so this
-costs nothing. Then wire it in safely:
+free **OpenRouter** account and one API key. Set the app's model to exactly
+`openrouter/free`, so this costs nothing. OpenRouter selects an available free
+model for each request, and the API response tells you which one it used. The
+answer style may vary a little; that is fine because each user message here is one
+independent model call. Then wire the key in safely:
 
 ```text
-Put the OpenRouter API key in an OPENROUTER_API_KEY variable in a .env file. Add
-.env to .gitignore so it's never committed. Read the key from the environment —
-never hardcode it.
+Set the model to exactly "openrouter/free". Put the OpenRouter API key in an
+OPENROUTER_API_KEY variable in a .env file. Add .env to .gitignore so it's never
+committed. Read the key from the environment — never hardcode it.
 ```
 
 ## 5. Add the "fit assessment" feature (job-seeker version)
@@ -70,7 +73,8 @@ settings (not in the code).
 ## 7. Guardrails
 
 - Answer **only** from context; if unknown, say so.
-- Each chat message is a real **API call**. We use a **free OpenRouter model**
+- Each chat message is a real **API call**. We use **`openrouter/free`**
   ([`MODEL-SETUP.md`](MODEL-SETUP.md)) — mind the **~50 requests/day** free limit
-  (add $10 of credits for 1,000/day if you need more).
+  (add $10 of credits for 1,000/day if you need more; see the
+  [official limits](https://openrouter.ai/docs/api/reference/limits)).
 - Never commit real personal data or your API key.
