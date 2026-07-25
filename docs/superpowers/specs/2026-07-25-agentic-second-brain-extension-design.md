@@ -27,6 +27,8 @@ production service.
 - No prior knowledge of function schemas, retrieval systems, or agent
   frameworks is assumed.
 - Primary building surface remains the Claude desktop app's Code tab.
+- Learner prompts are ordinary Claude Code prompts and do not require
+  Superpowers or another installed skill.
 - The extension uses the fictional Sam Rivera vault. Real CVs, private notes,
   client material, and other sensitive information are out of scope for the
   shared exercise and deployed reference.
@@ -40,6 +42,14 @@ sample note on every question. Learners transform that application rather than
 starting from a blank project or trying to modify many different personal apps.
 The finished reference shows the same user experience backed by bounded tool
 calling.
+
+The workshop also provides a "use my existing site" path for learners who
+already completed Build 3 in their own project. Its first prompt inspects their
+actual server API route and identifies where all notes enter the model request;
+it stops before editing. Later prompts preserve their frontend, provider
+configuration, deployment, and unrelated features while replacing only the
+all-context assembly with the same tested note tools and bounded loop. The
+prompts do not assume a particular `/api` filename or generated project shape.
 
 This creates an explicit before-and-after:
 
@@ -343,6 +353,24 @@ Eight staged copy-paste prompts:
 Each prompt identifies the intended outcome, protected boundaries, visible
 success condition, and verification command. Prompts tell the coding agent to
 stop after the checkpoint so learners can inspect the result.
+
+### Existing-site adaptation path
+
+A parallel prompt sequence begins by discovering the learner's current
+architecture:
+
+1. Find the server-side API route that calls OpenRouter.
+2. Show where note files are read and inserted into the request.
+3. Identify the current request/response contract and frontend dependencies.
+4. Propose the smallest mapping from current files to the three tool functions
+   and bounded controller, then stop for approval.
+5. Apply the same guided checkpoints without replacing the existing frontend or
+   changing deployment configuration unnecessarily.
+
+These are ordinary Claude Code prompts and do not invoke Superpowers. They name
+behavioral acceptance criteria rather than hard-coded filenames. If the
+learner's site exposes the API key in the browser or has no server route, the
+agent stops and fixes that secret boundary before the tool-loop work.
 
 ### Challenge path
 

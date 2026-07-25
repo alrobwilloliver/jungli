@@ -26,6 +26,11 @@ products:
 The embeddings "extra-extra" is explanatory plus an optional prompt path in this
 delivery. Building or hosting a vector database is explicitly deferred.
 
+Learner prompts do not require Superpowers. They support both the supplied
+baseline and an existing-site adaptation path that discovers the learner's
+actual server API route before proposing changes, then preserves the existing
+frontend, provider configuration, deployment, and unrelated features.
+
 Implementation should happen in a dedicated git worktree created from `main`.
 Do not modify the existing second-brain or chat-agent project semantics; link to
 the new optional extension from their READMEs only after the extension works.
@@ -1036,12 +1041,31 @@ Stop after:
 Do not tell students to paste real CVs. Prompts instruct Claude Code to explain
 tool schemas and the request loop in plain language before changes.
 
-- [ ] **Step 3: Write the challenge prompt**
+- [ ] **Step 3: Write the existing-site adaptation prompts**
+
+These are ordinary Claude Code prompts; they must not invoke or require
+Superpowers. The first prompt:
+
+- Searches the learner's current project for the server-side OpenRouter call.
+- Identifies the actual `/api` route or equivalent server boundary.
+- Shows where all note contents are currently assembled.
+- Records the current browser/server request and response contract.
+- Checks that the API key remains server-only.
+- Makes no changes and stops for learner approval.
+
+Later prompts map the discovered files to `list_notes`, `search_notes`,
+`read_note`, and the bounded controller. They specify behavior and acceptance
+criteria rather than assuming `app/api/chat/route.ts`. They preserve the
+learner's frontend, provider configuration, Vercel setup, and unrelated
+features. If no secure server boundary exists, the prompt stops and asks the
+learner to repair secret handling before proceeding.
+
+- [ ] **Step 4: Write the challenge prompt**
 
 Put it after the guided path. It uses the same interfaces, numeric limits,
 privacy rules, tests, and UI acceptance criteria without prescribing steps.
 
-- [ ] **Step 4: Write current model setup and troubleshooting**
+- [ ] **Step 5: Write current model setup and troubleshooting**
 
 Use official OpenRouter links and checked dates. Explain:
 
@@ -1056,13 +1080,13 @@ Use official OpenRouter links and checked dates. Explain:
 Name Nemotron only as the current provisional/validated candidate with a date.
 Do not promise continued free availability.
 
-- [ ] **Step 5: Link the optional extension**
+- [ ] **Step 6: Link the optional extension**
 
 Add one short "Optional next step" link to the existing second-brain and
 chat-agent READMEs. Do not rename Build 3 or retroactively claim its baseline is
 agentic.
 
-- [ ] **Step 6: Verify Markdown and wording**
+- [ ] **Step 7: Verify Markdown and wording**
 
 ```bash
 rg -n "real CV|personal data|always free|permanently free|50 requests" projects/agentic-second-brain projects/second-brain/README.md projects/chat-agent/README.md
@@ -1070,7 +1094,7 @@ rg -n "real CV|personal data|always free|permanently free|50 requests" projects/
 
 Manually confirm every time-sensitive claim has a checked date and source.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add projects/agentic-second-brain projects/second-brain/README.md projects/chat-agent/README.md
