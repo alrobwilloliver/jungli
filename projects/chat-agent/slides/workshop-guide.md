@@ -135,10 +135,18 @@ This is the real lesson of the day.
 one free OpenRouter key, then set the model to exactly **`openrouter/free`**.
 OpenRouter selects an available free model for each request, and the API response
 includes the actual model used. Response style may vary a little; that is fine
-because each user message here is one independent model call. Wire the key in safely:
+because each user message here is one independent model call.
+
+---
+
+## Wire the key safely
 
 ```text
-Set the model to exactly "openrouter/free". Put the OpenRouter API key in an OPENROUTER_API_KEY variable in a .env file. Add .env to .gitignore so it is never committed. Read the key from the environment in code — never hardcode it.
+Set the model to exactly "openrouter/free".
+Put the OpenRouter API key in an OPENROUTER_API_KEY
+variable in a .env file. Add .env to .gitignore so it
+is never committed. Read the key from the environment
+in code — never hardcode it.
 ```
 
 `.env` holds the secret · `.gitignore` keeps it off GitHub.
@@ -148,8 +156,9 @@ Set the model to exactly "openrouter/free". Put the OpenRouter API key in an OPE
 ## Never commit a key
 
 > **⚠️ The classic disaster — never commit a key.** A key pushed to a public repo
-> is in Git history **forever**, and bots scan public repos for keys and **run up
-> your bill**. If you ever leak one, **revoke it immediately** and make a new one.
+> is in Git history **forever**, and bots scan public repos for keys and can
+> **exhaust your quota or spend credits on your account**. If you ever leak one,
+> **revoke it immediately** and make a new one.
 > `.env` + `.gitignore`, every time — no exceptions.
 
 ---
@@ -205,9 +214,17 @@ Read the files in sample-persona/. Summarise what you know about this person so 
 Build a simple one-page web app with a chat box. When the user sends a message, call the LLM with the documents in sample-persona/ as context, and answer using ONLY that context. If the answer isn't there, say so.
 ```
 
+---
+
+## 8. Prompt reference *(continued)*
+
 **Wire the API key safely** (free OpenRouter key — see `MODEL-SETUP.md`)
 ```text
-Set the model to exactly "openrouter/free". Put the OpenRouter API key in an OPENROUTER_API_KEY variable in a .env file. Add .env to .gitignore so it is never committed. Read the key from the environment in code — never hardcode it.
+Set the model to exactly "openrouter/free".
+Put the OpenRouter API key in an OPENROUTER_API_KEY
+variable in a .env file. Add .env to .gitignore so it
+is never committed. Read the key from the environment
+in code — never hardcode it.
 ```
 
 ---

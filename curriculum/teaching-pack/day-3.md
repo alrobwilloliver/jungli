@@ -87,9 +87,9 @@ live, and where should it **never** go? ③ What does `.gitignore` do?
 
 **Base prompt (from `PROMPTS.md`):**
 ```
-Put the LLM API key in an environment variable in a .env file. Add .env to
-.gitignore so it is never committed. Read the key from the environment in code —
-never hardcode it.
+Set the model to exactly "openrouter/free". Put the OpenRouter API key in an
+OPENROUTER_API_KEY variable in a .env file. Add .env to .gitignore so it is never
+committed. Read the key from the environment in code — never hardcode it.
 ```
 
 ---
