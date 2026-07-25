@@ -54,8 +54,14 @@ trace and see that only selected note contents entered the model context.
 
 ## Deliverables
 
-Create a new project without changing the role of the existing Build 2 or Build
-3:
+First update the existing Build 3 setup materials to use `openrouter/free` by
+default instead of asking beginners to find and paste a specific `:free` model
+ID. Build 3 remains a single-call grounded chatbot; this removes a fragile setup
+step without changing that lesson's role. Explain that the router may select a
+different free model for each independent request.
+
+Then create a new project without changing the role of the existing Build 2 or
+Build 3:
 
 ```text
 projects/agentic-second-brain/
@@ -176,6 +182,10 @@ environment.
 Application code, not the model, owns the loop and its safety limits:
 
 - One model is selected at the start of each user question.
+- If the configured value is a router alias such as `openrouter/free`, the
+  actual model returned on the first response becomes the pinned model for all
+  subsequent calls in that run. A later identity change is an incompatible-run
+  error, not permission to mix transcripts.
 - A run uses at most three model calls.
 - A run reads at most four unique notes.
 - Only the three known tool names may execute.
@@ -248,7 +258,8 @@ described as permanently available.
 
 `openrouter/free` is a last-resort fallback. OpenRouter says it filters the free
 pool for requested capabilities such as tool calling, but it randomly selects
-within the eligible pool, so it is not the primary classroom path.
+within the eligible pool, so it is not the primary classroom path. When used,
+the controller pins the first actual model it returns for the rest of that run.
 
 Include an instructor-facing compatibility command:
 
