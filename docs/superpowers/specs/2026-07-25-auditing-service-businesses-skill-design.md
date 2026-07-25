@@ -1,7 +1,7 @@
 # Auditing Service Businesses Skill — Design
 
 **Date:** 2026-07-25  
-**Status:** Approved in conversation; specification review pending
+**Status:** Approved in conversation; implementation-readiness review passed
 
 ## Goal
 
