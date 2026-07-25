@@ -17,8 +17,9 @@ export default function SetupPage() {
           <li>
             <h3>Make a local environment file</h3>
             <p>
-              Copy <code>.env.example</code> to <code>.env.local</code>. The
-              local file is ignored by Git, so it will not be committed.
+              For local development, copy <code>.env.example</code> to{" "}
+              <code>.env.local</code>. The local file is ignored by Git, so it
+              will not be committed.
             </p>
           </li>
           <li>
@@ -38,6 +39,15 @@ export default function SetupPage() {
             </p>
           </li>
         </ol>
+      </section>
+
+      <section className="notice" aria-labelledby="deploy-setup">
+        <h2 id="deploy-setup">Deploying to Vercel</h2>
+        <p>
+          Add the same three values in Project Settings → Environment Variables,
+          then redeploy the app. Keep the key private and never collect it from
+          visitors in the browser.
+        </p>
       </section>
 
       <aside className="notice" aria-labelledby="why-private">

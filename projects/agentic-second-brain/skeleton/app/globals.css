@@ -135,9 +135,7 @@ h3 {
   display: grid;
   gap: 1rem;
   margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: steps;
+  padding-left: 2rem;
 }
 
 .steps li {
@@ -145,13 +143,11 @@ h3 {
   border: 1px solid var(--sage);
   border-radius: 0.75rem;
   background: var(--canopy);
-  counter-increment: steps;
 }
 
-.steps h3::before {
-  margin-right: 0.55rem;
+.steps li::marker {
   color: var(--marigold);
-  content: counter(steps) ".";
+  font-weight: 700;
 }
 
 .steps p,
