@@ -164,7 +164,9 @@ describe("POST /api/chat", () => {
     ["rate_limited", 429, "OpenRouter rate limit reached."],
     ["model_unavailable", 502, "The configured model is unavailable."],
     ["provider_unavailable", 503, "OpenRouter is temporarily unavailable."],
+    ["provider_error", 502, "OpenRouter request failed."],
     ["timeout", 504, "OpenRouter request timed out."],
+    ["request_aborted", 408, "Model request aborted."],
     ["invalid_response", 502, "OpenRouter returned an invalid response."],
   ] as const)(
     "maps %s adapter errors to sanitized JSON",

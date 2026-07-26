@@ -27,6 +27,7 @@ describe("createChatCompletion", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
     if (originalApiKey === undefined) {
       delete process.env.OPENROUTER_API_KEY;
     } else {
@@ -77,6 +78,86 @@ describe("createChatCompletion", () => {
 
     caller.abort();
     expect(signal?.aborted).toBe(true);
+  });
+
+  test("uses a 25-second timeout and maps its fetch rejection", async () => {
+    const timeout = new AbortController();
+    const timeoutSpy = vi
+      .spyOn(AbortSignal, "timeout")
+      .mockReturnValueOnce(timeout.signal);
+    vi.mocked(fetch).mockImplementationOnce(
+      (_url, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            reject(new DOMException("Timed out", "AbortError"));
+          });
+        }),
+    );
+
+    const completion = createChatCompletion({
+      model: "openrouter/free",
+      messages: [{ role: "user", content: "Question" }],
+    });
+    expect(timeoutSpy).toHaveBeenCalledWith(25_000);
+
+    timeout.abort(new DOMException("Timed out", "TimeoutError"));
+    await expect(completion).rejects.toMatchObject({
+      code: "timeout",
+      message: "OpenRouter request timed out.",
+    });
+  });
+
+  test("maps caller-aborted fetch rejection to request_aborted", async () => {
+    const caller = new AbortController();
+    vi.mocked(fetch).mockImplementationOnce(
+      (_url, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            reject(new DOMException("Aborted", "AbortError"));
+          });
+        }),
+    );
+
+    const completion = createChatCompletion({
+      model: "openrouter/free",
+      messages: [{ role: "user", content: "Question" }],
+      signal: caller.signal,
+    });
+    caller.abort();
+
+    await expect(completion).rejects.toMatchObject({
+      code: "request_aborted",
+      message: "Model request aborted.",
+    });
+  });
+
+  test("preserves the first abort cause when caller and timeout both abort", async () => {
+    const timeout = new AbortController();
+    vi.spyOn(AbortSignal, "timeout").mockReturnValueOnce(timeout.signal);
+    const caller = new AbortController();
+    vi.mocked(fetch).mockImplementationOnce(
+      (_url, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            queueMicrotask(() =>
+              reject(new DOMException("Aborted", "AbortError")),
+            );
+          });
+        }),
+    );
+
+    const completion = createChatCompletion({
+      model: "openrouter/free",
+      messages: [{ role: "user", content: "Question" }],
+      signal: caller.signal,
+    });
+    caller.abort(new DOMException("Caller aborted", "AbortError"));
+    timeout.abort(new DOMException("Timed out", "TimeoutError"));
+
+    await expect(completion).rejects.toMatchObject({
+      code: "request_aborted",
+      message: "Model request aborted.",
+    });
   });
 
   test("rejects missing server configuration before making a request", async () => {
@@ -153,4 +234,24 @@ describe("createChatCompletion", () => {
       message: "OpenRouter returned an invalid response.",
     });
   });
+
+  test.each([null, [], "text", 42, true])(
+    "classifies valid non-object JSON payload %# as an invalid response",
+    async (payload) => {
+      vi.mocked(fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify(payload), { status: 200 }),
+      );
+
+      await expect(
+        createChatCompletion({
+          model: "openrouter/free",
+          messages: [{ role: "user", content: "Question" }],
+        }),
+      ).rejects.toMatchObject({
+        name: "ModelAdapterError",
+        code: "invalid_response",
+        message: "OpenRouter returned an invalid response.",
+      });
+    },
+  );
 });

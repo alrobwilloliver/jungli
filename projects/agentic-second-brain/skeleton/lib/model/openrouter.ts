@@ -47,16 +47,6 @@ export interface ModelCompletion {
   };
 }
 
-interface CompletionPayload {
-  model?: unknown;
-  choices?: Array<{
-    message?: {
-      role?: unknown;
-      content?: unknown;
-    };
-  }>;
-}
-
 const errorForStatus = (status: number): ModelAdapterError => {
   if (status === 401) {
     return new ModelAdapterError(
@@ -85,19 +75,31 @@ const errorForStatus = (status: number): ModelAdapterError => {
   return new ModelAdapterError("provider_error", "OpenRouter request failed.");
 };
 
-const parseCompletion = (payload: CompletionPayload): ModelCompletion => {
-  const message = payload.choices?.[0]?.message;
+const invalidResponse = () =>
+  new ModelAdapterError(
+    "invalid_response",
+    "OpenRouter returned an invalid response.",
+  );
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const parseCompletion = (payload: unknown): ModelCompletion => {
+  if (!isRecord(payload) || !Array.isArray(payload.choices)) {
+    throw invalidResponse();
+  }
+
+  const choice = payload.choices[0];
+  const message = isRecord(choice) ? choice.message : undefined;
 
   if (
     typeof payload.model !== "string" ||
     !payload.model ||
-    message?.role !== "assistant" ||
+    !isRecord(message) ||
+    message.role !== "assistant" ||
     typeof message.content !== "string"
   ) {
-    throw new ModelAdapterError(
-      "invalid_response",
-      "OpenRouter returned an invalid response.",
-    );
+    throw invalidResponse();
   }
 
   return {
@@ -127,6 +129,22 @@ export async function createChatCompletion(input: {
   const requestSignal = input.signal
     ? AbortSignal.any([input.signal, timeoutSignal])
     : timeoutSignal;
+  let abortCause: "caller" | "timeout" | undefined;
+  const recordCallerAbort = () => {
+    abortCause ??= "caller";
+  };
+  const recordTimeoutAbort = () => {
+    abortCause ??= "timeout";
+  };
+
+  if (input.signal?.aborted) {
+    recordCallerAbort();
+  } else if (timeoutSignal.aborted) {
+    recordTimeoutAbort();
+  } else {
+    input.signal?.addEventListener("abort", recordCallerAbort, { once: true });
+    timeoutSignal.addEventListener("abort", recordTimeoutAbort, { once: true });
+  }
 
   let response: Response;
   try {
@@ -144,30 +162,30 @@ export async function createChatCompletion(input: {
       signal: requestSignal,
     });
   } catch {
-    if (timeoutSignal.aborted) {
+    if (abortCause === "timeout") {
       throw new ModelAdapterError("timeout", "OpenRouter request timed out.");
     }
-    if (input.signal?.aborted) {
+    if (abortCause === "caller") {
       throw new ModelAdapterError("request_aborted", "Model request aborted.");
     }
     throw new ModelAdapterError(
       "provider_unavailable",
       "OpenRouter is temporarily unavailable.",
     );
+  } finally {
+    input.signal?.removeEventListener("abort", recordCallerAbort);
+    timeoutSignal.removeEventListener("abort", recordTimeoutAbort);
   }
 
   if (!response.ok) {
     throw errorForStatus(response.status);
   }
 
-  let payload: CompletionPayload;
+  let payload: unknown;
   try {
-    payload = (await response.json()) as CompletionPayload;
+    payload = await response.json();
   } catch {
-    throw new ModelAdapterError(
-      "invalid_response",
-      "OpenRouter returned an invalid response.",
-    );
+    throw invalidResponse();
   }
 
   return parseCompletion(payload);
