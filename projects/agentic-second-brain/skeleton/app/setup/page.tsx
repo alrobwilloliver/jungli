@@ -1,4 +1,7 @@
 export default function SetupPage() {
+  const modelSetupUrl =
+    "https://github.com/alrobwilloliver/jungli/blob/main/projects/agentic-second-brain/skeleton/MODEL-SETUP.md";
+
   return (
     <article className="page">
       <header className="page-heading">
@@ -58,6 +61,13 @@ export default function SetupPage() {
           can call the model without exposing your credential.
         </p>
       </aside>
+
+      {modelSetupUrl.startsWith("https://") && (
+        <p className="setup-reference">
+          Need provider-specific help? Read the repository&apos;s{" "}
+          <a href={modelSetupUrl}>MODEL-SETUP.md guide</a>.
+        </p>
+      )}
     </article>
   );
 }

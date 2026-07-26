@@ -3,6 +3,10 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface ChatRequest {
+  messages: ChatMessage[];
+}
+
 export interface ActivityEvent {
   type: "context";
   message: string;
