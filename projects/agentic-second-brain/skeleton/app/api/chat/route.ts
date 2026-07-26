@@ -10,6 +10,73 @@ import {
 import { buildAllContext } from "@/lib/vault/all-context";
 import { loadVault } from "@/lib/vault/load-vault";
 
+const maxRequestBytes = 160_000;
+
+class RequestBodyError extends Error {
+  constructor(public readonly code: "invalid_request" | "payload_too_large") {
+    super(code);
+  }
+}
+
+const readRequestJson = async (request: Request): Promise<unknown> => {
+  const contentLength = request.headers.get("content-length");
+  if (contentLength !== null) {
+    if (!/^\d+$/.test(contentLength)) {
+      throw new RequestBodyError("invalid_request");
+    }
+
+    const declaredBytes = Number(contentLength);
+    if (declaredBytes > maxRequestBytes) {
+      throw new RequestBodyError("payload_too_large");
+    }
+    if (!Number.isSafeInteger(declaredBytes)) {
+      throw new RequestBodyError("invalid_request");
+    }
+  }
+
+  if (!request.body) {
+    throw new RequestBodyError("invalid_request");
+  }
+
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      totalBytes += value.byteLength;
+      if (totalBytes > maxRequestBytes) {
+        try {
+          await reader.cancel();
+        } catch {
+          // The size error is more useful than a stream cancellation error.
+        }
+        throw new RequestBodyError("payload_too_large");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  try {
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    return JSON.parse(text) as unknown;
+  } catch {
+    throw new RequestBodyError("invalid_request");
+  }
+};
+
 const messageSchema = z.object({
   role: z.enum(["user", "assistant"]),
   content: z.string().max(8_000),
@@ -64,8 +131,18 @@ const errorResponse = (code: string, message: string, status: number) =>
 export async function POST(request: Request) {
   let body: unknown;
   try {
-    body = await request.json();
-  } catch {
+    body = await readRequestJson(request);
+  } catch (error) {
+    if (
+      error instanceof RequestBodyError &&
+      error.code === "payload_too_large"
+    ) {
+      return errorResponse(
+        "payload_too_large",
+        "Chat request is too large.",
+        413,
+      );
+    }
     return errorResponse("invalid_request", "Send a valid user question.", 400);
   }
 
@@ -83,7 +160,15 @@ export async function POST(request: Request) {
         { role: "system", content: context.text },
         ...parsed.data.messages,
       ],
+      signal: request.signal,
     });
+
+    if (typeof completion.message.content !== "string") {
+      throw new ModelAdapterError(
+        "invalid_response",
+        "OpenRouter returned an invalid response.",
+      );
+    }
 
     const response: ChatResponse = {
       answer: completion.message.content,

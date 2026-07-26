@@ -20,6 +20,8 @@ vi.mock("@/lib/model/openrouter", async (importOriginal) => {
 import { POST } from "@/app/api/chat/route";
 import { ModelAdapterError } from "@/lib/model/openrouter";
 
+const originalModel = process.env.OPENROUTER_MODEL;
+
 const notes: VaultNote[] = [
   {
     path: "career/about-sam.md",
@@ -59,7 +61,11 @@ describe("POST /api/chat", () => {
   });
 
   afterEach(() => {
-    delete process.env.OPENROUTER_MODEL;
+    if (originalModel === undefined) {
+      delete process.env.OPENROUTER_MODEL;
+    } else {
+      process.env.OPENROUTER_MODEL = originalModel;
+    }
     vi.clearAllMocks();
   });
 
@@ -124,6 +130,7 @@ describe("POST /api/chat", () => {
           ),
         }),
       ]),
+      signal: expect.any(AbortSignal),
     });
 
     const payload = await response.json();
@@ -156,6 +163,131 @@ describe("POST /api/chat", () => {
     expect(mocks.createChatCompletion).toHaveBeenCalledWith(
       expect.objectContaining({ model: "openrouter/free" }),
     );
+  });
+
+  test("passes the request abort signal to the model adapter", async () => {
+    const chatRequest = request({
+      messages: [{ role: "user", content: "Question" }],
+    });
+
+    await POST(chatRequest);
+
+    expect(mocks.createChatCompletion).toHaveBeenCalledWith(
+      expect.objectContaining({ signal: chatRequest.signal }),
+    );
+  });
+
+  test("accepts a valid request without a Content-Length header", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/chat", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: "Question" }],
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.createChatCompletion).toHaveBeenCalledTimes(1);
+  });
+
+  test.each(["not-a-number", "-1", "1.5"])(
+    "rejects malformed Content-Length %s",
+    async (contentLength) => {
+      const response = await POST(
+        new Request("http://localhost/api/chat", {
+          method: "POST",
+          headers: { "content-length": contentLength },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: "Question" }],
+          }),
+        }),
+      );
+
+      expect(response.status).toBe(400);
+      await expect(response.json()).resolves.toEqual({
+        error: {
+          code: "invalid_request",
+          message: "Send a valid user question.",
+        },
+      });
+      expect(mocks.loadVault).not.toHaveBeenCalled();
+      expect(mocks.createChatCompletion).not.toHaveBeenCalled();
+    },
+  );
+
+  test("rejects an excessive declared Content-Length before provider work", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/chat", {
+        method: "POST",
+        headers: { "content-length": "200000" },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: "Question" }],
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(413);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: "payload_too_large",
+        message: "Chat request is too large.",
+      },
+    });
+    expect(mocks.loadVault).not.toHaveBeenCalled();
+    expect(mocks.createChatCompletion).not.toHaveBeenCalled();
+  });
+
+  test("rejects an actual body that exceeds an underreported Content-Length", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/chat", {
+        method: "POST",
+        headers: { "content-length": "10" },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: "x".repeat(200_000) }],
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(413);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: "payload_too_large",
+        message: "Chat request is too large.",
+      },
+    });
+    expect(mocks.loadVault).not.toHaveBeenCalled();
+    expect(mocks.createChatCompletion).not.toHaveBeenCalled();
+  });
+
+  test("rejects tool-call-only model output in the text baseline", async () => {
+    mocks.createChatCompletion.mockResolvedValueOnce({
+      model: "actual/free-model",
+      message: {
+        role: "assistant",
+        content: null,
+        tool_calls: [
+          {
+            id: "call-1",
+            type: "function",
+            function: { name: "search_notes", arguments: "{}" },
+          },
+        ],
+      },
+    });
+
+    const response = await POST(
+      request({ messages: [{ role: "user", content: "Question" }] }),
+    );
+
+    expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toEqual({
+      error: {
+        code: "invalid_response",
+        message: "OpenRouter returned an invalid response.",
+      },
+    });
   });
 
   test.each([

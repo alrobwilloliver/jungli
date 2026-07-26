@@ -63,6 +63,59 @@ describe("createChatCompletion", () => {
     });
   });
 
+  test("preserves tool definitions and prior tool messages in the request", async () => {
+    const toolCall = {
+      id: "call-1",
+      type: "function" as const,
+      function: {
+        name: "search_notes",
+        arguments: '{"query":"growth"}',
+      },
+    };
+    const messages = [
+      { role: "user" as const, content: "What grew?" },
+      {
+        role: "assistant" as const,
+        content: null,
+        tool_calls: [toolCall],
+      },
+      {
+        role: "tool" as const,
+        content: '{"matches":["projects/newsletter-growth.md"]}',
+        tool_call_id: "call-1",
+      },
+    ];
+    const tools = [
+      {
+        type: "function" as const,
+        function: {
+          name: "search_notes",
+          description: "Search note metadata and bodies.",
+          parameters: {
+            type: "object",
+            properties: { query: { type: "string" } },
+            required: ["query"],
+          },
+        },
+      },
+    ];
+
+    await createChatCompletion({
+      model: "tool-capable/model",
+      messages,
+      tools,
+    });
+
+    const requestBody = JSON.parse(
+      String(vi.mocked(fetch).mock.calls[0]![1]?.body),
+    );
+    expect(requestBody).toEqual({
+      model: "tool-capable/model",
+      messages,
+      tools,
+    });
+  });
+
   test("composes a caller abort signal with the timeout signal", async () => {
     const caller = new AbortController();
 
@@ -153,6 +206,68 @@ describe("createChatCompletion", () => {
     });
     caller.abort(new DOMException("Caller aborted", "AbortError"));
     timeout.abort(new DOMException("Timed out", "TimeoutError"));
+
+    await expect(completion).rejects.toMatchObject({
+      code: "request_aborted",
+      message: "Model request aborted.",
+    });
+  });
+
+  test("maps a timeout while reading the response body", async () => {
+    const timeout = new AbortController();
+    vi.spyOn(AbortSignal, "timeout").mockReturnValueOnce(timeout.signal);
+    vi.mocked(fetch).mockImplementationOnce((_url, init) => {
+      const signal = init?.signal;
+      return Promise.resolve(
+        new Response(
+          new ReadableStream({
+            start(controller) {
+              signal?.addEventListener("abort", () => {
+                controller.error(new DOMException("Timed out", "AbortError"));
+              });
+            },
+          }),
+          { status: 200 },
+        ),
+      );
+    });
+
+    const completion = createChatCompletion({
+      model: "openrouter/free",
+      messages: [{ role: "user", content: "Question" }],
+    });
+    timeout.abort(new DOMException("Timed out", "TimeoutError"));
+
+    await expect(completion).rejects.toMatchObject({
+      code: "timeout",
+      message: "OpenRouter request timed out.",
+    });
+  });
+
+  test("maps caller abort while reading the response body", async () => {
+    const caller = new AbortController();
+    vi.mocked(fetch).mockImplementationOnce((_url, init) => {
+      const signal = init?.signal;
+      return Promise.resolve(
+        new Response(
+          new ReadableStream({
+            start(controller) {
+              signal?.addEventListener("abort", () => {
+                controller.error(new DOMException("Aborted", "AbortError"));
+              });
+            },
+          }),
+          { status: 200 },
+        ),
+      );
+    });
+
+    const completion = createChatCompletion({
+      model: "openrouter/free",
+      messages: [{ role: "user", content: "Question" }],
+      signal: caller.signal,
+    });
+    caller.abort();
 
     await expect(completion).rejects.toMatchObject({
       code: "request_aborted",
@@ -254,4 +369,151 @@ describe("createChatCompletion", () => {
       });
     },
   );
+
+  test("preserves a validated assistant tool call with null content", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          model: "actual/model",
+          choices: [
+            {
+              message: {
+                role: "assistant",
+                content: null,
+                tool_calls: [
+                  {
+                    id: "call-1",
+                    type: "function",
+                    function: {
+                      name: "search_notes",
+                      arguments: '{"query":"growth"}',
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    await expect(
+      createChatCompletion({
+        model: "openrouter/free",
+        messages: [{ role: "user", content: "Question" }],
+      }),
+    ).resolves.toEqual({
+      model: "actual/model",
+      message: {
+        role: "assistant",
+        content: null,
+        tool_calls: [
+          {
+            id: "call-1",
+            type: "function",
+            function: {
+              name: "search_notes",
+              arguments: '{"query":"growth"}',
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  test("preserves empty assistant text for the caller to interpret", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          model: "actual/model",
+          choices: [
+            {
+              message: {
+                role: "assistant",
+                content: "",
+              },
+            },
+          ],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    await expect(
+      createChatCompletion({
+        model: "openrouter/free",
+        messages: [{ role: "user", content: "Question" }],
+      }),
+    ).resolves.toEqual({
+      model: "actual/model",
+      message: {
+        role: "assistant",
+        content: "",
+      },
+    });
+  });
+
+  test.each([
+    ["neither text nor tool calls", { content: null }],
+    ["an empty tool-call list", { content: null, tool_calls: [] }],
+    [
+      "a missing tool-call id",
+      {
+        content: null,
+        tool_calls: [
+          {
+            type: "function",
+            function: { name: "search_notes", arguments: "{}" },
+          },
+        ],
+      },
+    ],
+    [
+      "a non-function tool-call type",
+      {
+        content: null,
+        tool_calls: [
+          {
+            id: "call-1",
+            type: "plugin",
+            function: { name: "search_notes", arguments: "{}" },
+          },
+        ],
+      },
+    ],
+    [
+      "non-string tool arguments",
+      {
+        content: null,
+        tool_calls: [
+          {
+            id: "call-1",
+            type: "function",
+            function: { name: "search_notes", arguments: {} },
+          },
+        ],
+      },
+    ],
+  ])("rejects an assistant response with %s", async (_description, message) => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          model: "actual/model",
+          choices: [{ message: { role: "assistant", ...message } }],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    await expect(
+      createChatCompletion({
+        model: "openrouter/free",
+        messages: [{ role: "user", content: "Question" }],
+      }),
+    ).rejects.toMatchObject({
+      code: "invalid_response",
+      message: "OpenRouter returned an invalid response.",
+    });
+  });
 });

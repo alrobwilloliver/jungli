@@ -22,12 +22,21 @@ export class ModelAdapterError extends Error {
   }
 }
 
+export interface ModelToolCall {
+  id: string;
+  type: "function";
+  function: {
+    name: string;
+    arguments: string;
+  };
+}
+
 export interface ModelMessage {
   role: "system" | "user" | "assistant" | "tool";
   content: string | null;
   name?: string;
   tool_call_id?: string;
-  tool_calls?: unknown[];
+  tool_calls?: ModelToolCall[];
 }
 
 export interface ModelTool {
@@ -43,7 +52,8 @@ export interface ModelCompletion {
   model: string;
   message: {
     role: "assistant";
-    content: string;
+    content: string | null;
+    tool_calls?: ModelToolCall[];
   };
 }
 
@@ -84,6 +94,30 @@ const invalidResponse = () =>
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+const parseToolCall = (value: unknown): ModelToolCall | undefined => {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== "string" ||
+    !value.id ||
+    value.type !== "function" ||
+    !isRecord(value.function) ||
+    typeof value.function.name !== "string" ||
+    !value.function.name ||
+    typeof value.function.arguments !== "string"
+  ) {
+    return undefined;
+  }
+
+  return {
+    id: value.id,
+    type: "function",
+    function: {
+      name: value.function.name,
+      arguments: value.function.arguments,
+    },
+  };
+};
+
 const parseCompletion = (payload: unknown): ModelCompletion => {
   if (!isRecord(payload) || !Array.isArray(payload.choices)) {
     throw invalidResponse();
@@ -96,8 +130,32 @@ const parseCompletion = (payload: unknown): ModelCompletion => {
     typeof payload.model !== "string" ||
     !payload.model ||
     !isRecord(message) ||
-    message.role !== "assistant" ||
-    typeof message.content !== "string"
+    message.role !== "assistant"
+  ) {
+    throw invalidResponse();
+  }
+
+  const rawToolCalls = message.tool_calls;
+  const parsedToolCalls = Array.isArray(rawToolCalls)
+    ? rawToolCalls.map(parseToolCall)
+    : [];
+  const toolCalls = parsedToolCalls.filter(
+    (call): call is ModelToolCall => call !== undefined,
+  );
+  const hasInvalidToolCalls =
+    rawToolCalls !== undefined &&
+    (!Array.isArray(rawToolCalls) ||
+      toolCalls.length !== parsedToolCalls.length);
+  const content =
+    typeof message.content === "string" || message.content === null
+      ? message.content
+      : undefined;
+  const hasToolCalls = toolCalls.length > 0;
+
+  if (
+    hasInvalidToolCalls ||
+    content === undefined ||
+    (content === null && !hasToolCalls)
   ) {
     throw invalidResponse();
   }
@@ -106,7 +164,8 @@ const parseCompletion = (payload: unknown): ModelCompletion => {
     model: payload.model,
     message: {
       role: "assistant",
-      content: message.content,
+      content,
+      ...(hasToolCalls ? { tool_calls: toolCalls } : {}),
     },
   };
 };
@@ -146,9 +205,17 @@ export async function createChatCompletion(input: {
     timeoutSignal.addEventListener("abort", recordTimeoutAbort, { once: true });
   }
 
-  let response: Response;
+  const abortError = () => {
+    if (abortCause === "timeout") {
+      return new ModelAdapterError("timeout", "OpenRouter request timed out.");
+    }
+    if (abortCause === "caller") {
+      return new ModelAdapterError("request_aborted", "Model request aborted.");
+    }
+  };
+
   try {
-    response = await fetch(endpoint, {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -161,32 +228,34 @@ export async function createChatCompletion(input: {
       }),
       signal: requestSignal,
     });
-  } catch {
-    if (abortCause === "timeout") {
-      throw new ModelAdapterError("timeout", "OpenRouter request timed out.");
+
+    requestSignal.throwIfAborted();
+    if (!response.ok) {
+      throw errorForStatus(response.status);
     }
-    if (abortCause === "caller") {
-      throw new ModelAdapterError("request_aborted", "Model request aborted.");
+
+    let payload: unknown;
+    try {
+      payload = await response.json();
+    } catch {
+      throw abortError() ?? invalidResponse();
     }
-    throw new ModelAdapterError(
-      "provider_unavailable",
-      "OpenRouter is temporarily unavailable.",
+
+    requestSignal.throwIfAborted();
+    return parseCompletion(payload);
+  } catch (error) {
+    if (error instanceof ModelAdapterError) {
+      throw error;
+    }
+    throw (
+      abortError() ??
+      new ModelAdapterError(
+        "provider_unavailable",
+        "OpenRouter is temporarily unavailable.",
+      )
     );
   } finally {
     input.signal?.removeEventListener("abort", recordCallerAbort);
     timeoutSignal.removeEventListener("abort", recordTimeoutAbort);
   }
-
-  if (!response.ok) {
-    throw errorForStatus(response.status);
-  }
-
-  let payload: unknown;
-  try {
-    payload = await response.json();
-  } catch {
-    throw invalidResponse();
-  }
-
-  return parseCompletion(payload);
 }
