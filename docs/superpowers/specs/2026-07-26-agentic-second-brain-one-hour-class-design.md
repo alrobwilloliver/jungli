@@ -7,15 +7,19 @@
 **Relationship to the original design:** This document narrows the classroom
 path described in
 [`2026-07-25-agentic-second-brain-extension-design.md`](2026-07-25-agentic-second-brain-extension-design.md).
-It does not remove the robust finished reference, but it replaces the original
-90–120 minute learner sequence with a hard 60-minute core build.
+It does not remove the robust finished reference. It supersedes the original
+90–120 minute workshop sequence and the original eight-prompt guided beginner
+path. The application architecture, safety limits, privacy requirements,
+finished reference, compatibility checker, and optional embeddings extension
+remain in force.
 
 ## Goal
 
 A beginner starts with a polished, working chatbot, upgrades it into a small
-tool-using agent with guided Claude Code prompts, observes the agent choosing
-and reading relevant notes, and then asks one question against their own
-Markdown second brain within one hour.
+tool-using agent with guided Claude Code prompts, and observes the agent
+choosing and reading relevant Sam Rivera notes within one hour. Switching to a
+personal Markdown second brain is an optional final step, not a requirement for
+completing the class.
 
 The lesson teaches one contrast:
 
@@ -31,11 +35,17 @@ The reliable shared build uses only the fictional Sam Rivera vault. Learners do
 not begin by debugging their own filenames, note formats, private data, or
 provider-policy choices.
 
-After the Sam build works, learners may copy their own Markdown notes into the
-vault during the final classroom step. Before doing so, the guide explicitly
-states that note contents are sent to the configured model provider and asks
-learners to review and accept that provider's current data policy. Learners who
-do not want to send personal notes keep using Sam's fictional vault.
+After the Sam build works, learners may copy their own Markdown notes into a
+separate `vault-personal/` directory during the final classroom step. The Sam
+vault remains untouched as the reversible recovery fixture.
+
+Personal notes are disabled when the application uses `openrouter/free`, an
+automatic router alias, or an automatic fallback. Before enabling
+`vault-personal/`, the instructor must configure one fixed, currently validated
+model/provider, review its current data policy with learners, and disable
+automatic fallback for that run. Learners explicitly choose whether they
+accept that policy. Anyone who declines, or any class without a validated fixed
+provider, completes the lesson with Sam's fictional vault.
 
 ## Project shape
 
@@ -57,18 +67,33 @@ visual design during the optional class.
 
 ### Learner upgrade
 
-The learner work is limited to four checkpoints:
+The learner work is limited to four checkpoints and four corresponding Claude
+Code prompts:
 
-1. Inspect the baseline and observe that all five Sam notes are sent.
-2. Add and test `list_notes`, `search_notes`, and `read_note`.
-3. Connect those functions to a prepared bounded-controller scaffold.
-4. Ask a Sam question and observe search → read → sourced answer.
+1. **Inspect:** locate the all-context assembly, observe that all five Sam notes
+   are sent, explain the before/after data flow, and make no changes.
+2. **Build tools:** implement and test `list_notes`, `search_notes`, and
+   `read_note` against the supplied interfaces and fixtures.
+3. **Connect controller:** fill only the marked integration points that expose
+   the three schemas, dispatch validated tool calls, and append tool results.
+4. **Verify:** run the mocked controller test, ask a Sam question, and compare
+   the selected evidence and activity with the baseline.
 
 Claude Code prompts state the intended result, files allowed to change,
 protected boundaries, verification command, and stop point. The prompts use
 plain language and do not require Superpowers or another installed skill.
 
-The controller scaffold owns the difficult safety mechanics before class:
+The controller scaffold lives in `lib/agent/controller.ts`. It exports
+`runAgent(input, deps)` and contains clearly marked learner integration points
+for:
+
+- Importing the three tool definitions.
+- Passing them on each model request.
+- Executing validated calls through `executeTool`.
+- Appending the assistant tool-call message and matching tool results.
+
+Learners may change only those marked regions during checkpoint 3. The
+controller scaffold owns the difficult safety mechanics before class:
 
 - Three model calls at most.
 - Four unique note reads at most.
@@ -94,15 +119,27 @@ participate in the demonstration and personal-vault step.
 
 | Time | Classroom activity | Visible checkpoint |
 |---|---|---|
-| 0–10 min | Run the skeleton and inspect the request | UI reports all five notes sent |
-| 10–25 min | Add and test the three note functions | Focused tool tests pass |
-| 25–45 min | Connect tools to the prepared controller | Mocked agent-loop test passes |
-| 45–52 min | Ask the supplied Sam question | Activity shows search, read, answer, and sources |
-| 52–60 min | Optionally copy in the learner's Markdown notes | One grounded question works against their vault |
+| 0–5 min | **Concept:** chatbot context versus agent choice | Learner can explain the before/after arrows |
+| 5–10 min | **Demo:** run the skeleton and inspect the request | UI reports all five notes sent |
+| 10–25 min | **Build:** add and test the three note functions | Focused tool tests pass |
+| 25–30 min | **Concept:** schema describes; application executes | Learner identifies both halves of a tool |
+| 30–45 min | **Build:** connect tools to the prepared controller | Mocked agent-loop test passes |
+| 45–52 min | **Demo:** ask the supplied Sam question | Activity shows search, read, answer, and sources |
+| 52–55 min | **Trap:** malformed call, free capacity, and privacy | Learner can classify the failure |
+| 55–60 min | Optional personal-vault switch or instructor recap | Sam core remains a complete success |
 
-The instructor demonstrates rather than waits on live free-model
-infrastructure when capacity or model compatibility is poor. Mocked tests make
-the build checkpoint reliable without consuming API requests.
+The prepared start state is a repository clone with dependencies installed,
+the skeleton tests passing, and either a working class API configuration or
+the supplied mocked provider fixtures. Mocked operation counts as completion
+for every coding checkpoint; live inference is a demonstration, not a build
+gate.
+
+The instructor dry-runs the four prompts from a clean skeleton before class and
+records elapsed wall time. One rehearsal by a beginner-level tester must finish
+the Sam core in 45 minutes or less. At minute 25, learners without passing tool
+tests switch to the finished tool files. At minute 45, learners without a
+passing controller test switch to the finished reference. These cutovers
+protect the final concept, trap, and optional-vault time.
 
 ## Data flow
 
@@ -134,6 +171,25 @@ The learner-facing path distinguishes:
 The interface offers a safe retry where appropriate. It never exposes provider
 payloads, API keys, or hidden model reasoning.
 
+## Personal-vault switch
+
+The default server-side vault root is `vault/`. The optional classroom switch
+uses:
+
+```dotenv
+VAULT_DIRECTORY=vault-personal
+```
+
+The application accepts only a safe project-relative directory, rejects
+absolute paths and traversal, recursively loads Markdown files, and requires a
+server restart after the variable changes. The learner copies notes into
+`vault-personal/`; they do not append them to Sam's vault or delete the recovery
+fixture. Removing the variable and restarting returns to Sam without code
+changes.
+
+The personal directory is local-only by default and remains ignored by Git.
+Deploying personal notes is outside the one-hour exercise.
+
 ## Verification and success criteria
 
 The classroom path is ready only when:
@@ -141,13 +197,17 @@ The classroom path is ready only when:
 - Skeleton and finished projects both pass tests, formatting, lint, typecheck,
   and production builds.
 - The skeleton visibly sends all five Sam notes.
-- The finished application reads only selected notes for the supplied question.
+- For the supplied question, only note bodies returned by successful
+  `read_note` calls enter model context. A controller test inspects every model
+  request and proves that unselected note bodies are absent.
 - Tool tests cover ranking, result limits, and unsafe paths.
 - Controller tests cover a normal run, malformed calls, duplicates, limits,
   model pinning, and honest failure.
-- The four guided prompts can be followed from a clean skeleton in 45 minutes
-  or less, leaving at least 8 minutes for the learner-vault step.
-- A learner can replace the vault contents without changing application code.
+- The four guided prompts can be followed from the prepared start state in 45
+  minutes or less under the dry-run rubric, leaving time for the trap and
+  optional learner-vault step.
+- A learner can switch to and from a separate personal vault without changing
+  application code or deleting Sam's recovery fixture.
 - The personal-vault instructions present the provider-policy decision before
   asking learners to copy private notes.
 
