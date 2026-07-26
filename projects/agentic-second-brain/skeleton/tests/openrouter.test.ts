@@ -294,7 +294,7 @@ describe("createChatCompletion", () => {
   test.each([
     [401, "invalid_api_key", "OpenRouter authentication failed."],
     [429, "rate_limited", "OpenRouter rate limit reached."],
-    [400, "model_unavailable", "The configured model is unavailable."],
+    [400, "provider_error", "OpenRouter request failed."],
     [404, "model_unavailable", "The configured model is unavailable."],
     [500, "provider_unavailable", "OpenRouter is temporarily unavailable."],
     [503, "provider_unavailable", "OpenRouter is temporarily unavailable."],

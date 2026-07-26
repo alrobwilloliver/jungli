@@ -70,7 +70,7 @@ const errorForStatus = (status: number): ModelAdapterError => {
       "OpenRouter rate limit reached.",
     );
   }
-  if (status === 400 || status === 404) {
+  if (status === 404) {
     return new ModelAdapterError(
       "model_unavailable",
       "The configured model is unavailable.",

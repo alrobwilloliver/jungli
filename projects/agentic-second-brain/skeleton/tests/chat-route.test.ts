@@ -118,18 +118,15 @@ describe("POST /api/chat", () => {
     expect(mocks.createChatCompletion).toHaveBeenCalledTimes(1);
     expect(mocks.createChatCompletion).toHaveBeenCalledWith({
       model: "configured/free-model",
-      messages: expect.arrayContaining([
+      messages: [
         expect.objectContaining({
           role: "system",
           content: expect.stringContaining("SOURCE: career/about-sam.md"),
         }),
-        expect.objectContaining({
-          role: "system",
-          content: expect.stringContaining(
-            "SOURCE: projects/newsletter-growth.md",
-          ),
-        }),
-      ]),
+        { role: "user", content: "What did Sam grow?" },
+        { role: "assistant", content: "Let me check." },
+        { role: "user", content: "Please answer from the vault." },
+      ],
       signal: expect.any(AbortSignal),
     });
 
@@ -289,6 +286,31 @@ describe("POST /api/chat", () => {
       },
     });
   });
+
+  test.each(["", " \n\t"])(
+    "rejects blank assistant text in the text baseline",
+    async (content) => {
+      mocks.createChatCompletion.mockResolvedValueOnce({
+        model: "actual/free-model",
+        message: {
+          role: "assistant",
+          content,
+        },
+      });
+
+      const response = await POST(
+        request({ messages: [{ role: "user", content: "Question" }] }),
+      );
+
+      expect(response.status).toBe(502);
+      await expect(response.json()).resolves.toEqual({
+        error: {
+          code: "invalid_response",
+          message: "OpenRouter returned an invalid response.",
+        },
+      });
+    },
+  );
 
   test.each([
     ["missing_api_key", 503, "OpenRouter is not configured."],

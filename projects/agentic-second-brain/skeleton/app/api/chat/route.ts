@@ -163,7 +163,10 @@ export async function POST(request: Request) {
       signal: request.signal,
     });
 
-    if (typeof completion.message.content !== "string") {
+    if (
+      typeof completion.message.content !== "string" ||
+      !completion.message.content.trim()
+    ) {
       throw new ModelAdapterError(
         "invalid_response",
         "OpenRouter returned an invalid response.",
