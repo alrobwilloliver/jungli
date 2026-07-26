@@ -48,6 +48,8 @@ describe("tool checkpoint", () => {
     expect(listNotes(notes, "projects").map(({ path }) => path)).toEqual([
       "projects/zeta.md",
     ]);
+    expect(listNotes(notes, "project")).toEqual([]);
+    expect(listNotes(notes, "")).toEqual([]);
   });
 
   test("ranks title above tag and folder above body matches", () => {
@@ -68,6 +70,25 @@ describe("tool checkpoint", () => {
     ]);
   });
 
+  test("normalizes punctuation and case, adds every term, and rewards an exact title", () => {
+    const notes = [
+      note("projects/growth.md", "Newsletter Growth", "Retention lessons"),
+      note("other.md", "Other", "newsletter only"),
+    ];
+
+    expect(searchNotes(notes, "NEWSLETTER, growth!")[0]).toMatchObject({
+      path: "projects/growth.md",
+      score: 24,
+    });
+  });
+
+  test("returns no results for empty or punctuation-only queries", () => {
+    const notes = [note("one.md", "One", "body")];
+
+    expect(searchNotes(notes, "")).toEqual([]);
+    expect(searchNotes(notes, " ... !!! ")).toEqual([]);
+  });
+
   test("returns no more than five metadata results with 320-character snippets", () => {
     const notes = Array.from({ length: 7 }, (_, index) =>
       note(
@@ -83,6 +104,16 @@ describe("tool checkpoint", () => {
     expect(results.every(({ snippet }) => snippet.length <= 320)).toBe(true);
     expect(results.every((result) => !("body" in result))).toBe(true);
     expect(JSON.stringify(results)).not.toContain("SECRET");
+  });
+
+  test("keeps a matched body term in a bounded snippet after a long prefix", () => {
+    const results = searchNotes(
+      [note("punctuation.md", "Punctuation", `${"!".repeat(500)}needle tail`)],
+      "needle",
+    );
+
+    expect(results[0].snippet).toContain("needle");
+    expect(results[0].snippet.length).toBeLessThanOrEqual(320);
   });
 
   test("reads only an exact allowlisted path and rejects traversal variants", () => {

@@ -102,7 +102,7 @@ describe("POST /api/chat", () => {
     expect(mocks.createChatCompletion).not.toHaveBeenCalled();
   });
 
-  test("loads every note, calls the configured model once, and returns diagnostics", async () => {
+  test("loads the vault, calls the agent, and returns agentic diagnostics", async () => {
     const response = await POST(
       request({
         messages: [
@@ -116,43 +116,42 @@ describe("POST /api/chat", () => {
     expect(response.status).toBe(200);
     expect(mocks.loadVault).toHaveBeenCalledTimes(1);
     expect(mocks.createChatCompletion).toHaveBeenCalledTimes(1);
-    expect(mocks.createChatCompletion).toHaveBeenCalledWith({
-      model: "configured/free-model",
-      messages: [
-        expect.objectContaining({
-          role: "system",
-          content: expect.stringContaining("SOURCE: career/about-sam.md"),
-        }),
-        { role: "user", content: "What did Sam grow?" },
-        { role: "assistant", content: "Let me check." },
-        { role: "user", content: "Please answer from the vault." },
-      ],
-      signal: expect.any(AbortSignal),
-    });
+    expect(mocks.createChatCompletion).toHaveBeenCalledWith(
+      expect.objectContaining({
+        model: "configured/free-model",
+        messages: expect.arrayContaining([
+          expect.objectContaining({
+            role: "system",
+            content: expect.stringContaining("untrusted evidence"),
+          }),
+          { role: "user", content: "Please answer from the vault." },
+        ]),
+        tools: expect.any(Array),
+        signal: expect.any(AbortSignal),
+      }),
+    );
 
     const payload = await response.json();
     expect(payload).toEqual({
-      mode: "baseline",
+      mode: "agentic",
       answer: "Sam grew a newsletter.",
       model: "actual/free-model",
       restarted: false,
-      sources: ["career/about-sam.md", "projects/newsletter-growth.md"],
+      sources: [],
       activity: [
         {
-          type: "context",
-          message: "Sent all 2 notes as context",
+          type: "answer",
+          message: "Answered from selected evidence",
         },
       ],
       usage: {
         modelCalls: 1,
-        notesSent: 2,
+        notesSent: 0,
         notesRead: 0,
         contextCharacters: expect.any(Number),
       },
     });
-    expect(payload.usage.contextCharacters).toBeGreaterThan(
-      notes.reduce((sum, note) => sum + note.body.length, 0),
-    );
+    expect(payload.usage.contextCharacters).toBeGreaterThan(0);
   });
 
   test("uses openrouter/free when no model is configured", async () => {
@@ -163,6 +162,25 @@ describe("POST /api/chat", () => {
     expect(mocks.createChatCompletion).toHaveBeenCalledWith(
       expect.objectContaining({ model: "openrouter/free" }),
     );
+  });
+
+  test("rejects unsafe personal vault configuration before loading notes", async () => {
+    process.env.VAULT_DIRECTORY = "vault-personal";
+    delete process.env.PERSONAL_VAULT_POLICY_ACCEPTED;
+    try {
+      const response = await POST(
+        request({ messages: [{ role: "user", content: "Question" }] }),
+      );
+      expect(response.status).toBe(400);
+      await expect(response.json()).resolves.toMatchObject({
+        error: { code: "unsafe_personal_vault_configuration" },
+      });
+      expect(mocks.loadVault).not.toHaveBeenCalled();
+      expect(mocks.createChatCompletion).not.toHaveBeenCalled();
+    } finally {
+      delete process.env.VAULT_DIRECTORY;
+      delete process.env.PERSONAL_VAULT_POLICY_ACCEPTED;
+    }
   });
 
   test("passes the request abort signal to the model adapter", async () => {
@@ -261,7 +279,7 @@ describe("POST /api/chat", () => {
     expect(mocks.createChatCompletion).not.toHaveBeenCalled();
   });
 
-  test("rejects tool-call-only model output in the text baseline", async () => {
+  test("continues after a tool-call-only model output", async () => {
     mocks.createChatCompletion.mockResolvedValueOnce({
       model: "actual/free-model",
       message: {
@@ -281,17 +299,12 @@ describe("POST /api/chat", () => {
       request({ messages: [{ role: "user", content: "Question" }] }),
     );
 
-    expect(response.status).toBe(502);
-    await expect(response.json()).resolves.toEqual({
-      error: {
-        code: "invalid_response",
-        message: "OpenRouter returned an invalid response.",
-      },
-    });
+    expect(response.status).toBe(200);
+    expect(mocks.createChatCompletion).toHaveBeenCalledTimes(2);
   });
 
   test.each(["", " \n\t"])(
-    "rejects blank assistant text in the text baseline",
+    "returns an honest bounded fallback for blank assistant text",
     async (content) => {
       mocks.createChatCompletion.mockResolvedValueOnce({
         model: "actual/free-model",
@@ -305,12 +318,11 @@ describe("POST /api/chat", () => {
         request({ messages: [{ role: "user", content: "Question" }] }),
       );
 
-      expect(response.status).toBe(502);
-      await expect(response.json()).resolves.toEqual({
-        error: {
-          code: "invalid_response",
-          message: "OpenRouter returned an invalid response.",
-        },
+      expect(response.status).toBe(200);
+      await expect(response.json()).resolves.toMatchObject({
+        mode: "agentic",
+        answer:
+          "I could not gather enough reliable evidence from the vault to answer.",
       });
     },
   );

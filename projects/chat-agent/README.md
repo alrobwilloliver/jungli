@@ -5,9 +5,10 @@ asks questions and gets answers grounded in a body of context — the **Build 2
 brain**. Pairs with Build 3 in [`../../curriculum/lesson-plans.md`](../../curriculum/lesson-plans.md).
 
 > **Two personas, identical build:**
-> - **Job-seeker** → a recruiter chats with your *career agent*; paste a job
+>
+> - **Job-seeker** → a recruiter chats with your _career agent_; paste a job
 >   description → a **fit assessment**. Live reference: **[alanoliver.dev](https://alanoliver.dev)**.
-> - **Entrepreneur** → a customer chats with your *product agent* about your offer/FAQ.
+> - **Entrepreneur** → a customer chats with your _product agent_ about your offer/FAQ.
 
 It builds on **Build 1** (the site it lives on) and **Build 2** (the brain it
 answers from).
@@ -16,7 +17,7 @@ answers from).
 
 **One person's CV — or one small product — fits in the context window.** No vector
 database, no embeddings, no RAG infrastructure: you just put the documents into the
-model's context. That keeps it buildable for beginners *and* ties straight back to
+model's context. That keeps it buildable for beginners _and_ ties straight back to
 the Build-2 context lesson.
 
 ## ⚠️ Privacy
@@ -33,8 +34,12 @@ What an app is (frontend/backend, data flow) · calling an **LLM API** · **API 
 
 ## What's here
 
-| Folder | What it is |
-|---|---|
-| `skeleton/` | Docs-only starter + `sample-persona/` (Sam Rivera) to build against. |
-| `slides/` | PPT slides to add. |
-| *(live)* | **[alanoliver.dev](https://alanoliver.dev)** is the working reference build. |
+| Folder      | What it is                                                                   |
+| ----------- | ---------------------------------------------------------------------------- |
+| `skeleton/` | Docs-only starter + `sample-persona/` (Sam Rivera) to build against.         |
+| `slides/`   | PPT slides to add.                                                           |
+| _(live)_    | **[alanoliver.dev](https://alanoliver.dev)** is the working reference build. |
+
+Optional next step: build the
+[Agentic Second Brain class](../agentic-second-brain/README.md), which adds
+bounded note tools and visible retrieval activity.

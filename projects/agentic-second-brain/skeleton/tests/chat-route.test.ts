@@ -165,6 +165,25 @@ describe("POST /api/chat", () => {
     );
   });
 
+  test("rejects unsafe personal vault configuration before loading notes", async () => {
+    process.env.VAULT_DIRECTORY = "vault-personal";
+    delete process.env.PERSONAL_VAULT_POLICY_ACCEPTED;
+    try {
+      const response = await POST(
+        request({ messages: [{ role: "user", content: "Question" }] }),
+      );
+      expect(response.status).toBe(400);
+      await expect(response.json()).resolves.toMatchObject({
+        error: { code: "unsafe_personal_vault_configuration" },
+      });
+      expect(mocks.loadVault).not.toHaveBeenCalled();
+      expect(mocks.createChatCompletion).not.toHaveBeenCalled();
+    } finally {
+      delete process.env.VAULT_DIRECTORY;
+      delete process.env.PERSONAL_VAULT_POLICY_ACCEPTED;
+    }
+  });
+
   test("passes the request abort signal to the model adapter", async () => {
     const chatRequest = request({
       messages: [{ role: "user", content: "Question" }],

@@ -116,6 +116,27 @@ describe("createChatCompletion", () => {
     });
   });
 
+  test("serializes fail-closed provider constraints", async () => {
+    await createChatCompletion({
+      model: "fixed/model",
+      messages: [{ role: "user", content: "Question" }],
+      provider: {
+        only: ["fixed-provider"],
+        allow_fallbacks: false,
+        data_collection: "deny",
+        zdr: true,
+      },
+    });
+
+    const body = JSON.parse(String(vi.mocked(fetch).mock.calls[0]![1]?.body));
+    expect(body.provider).toEqual({
+      only: ["fixed-provider"],
+      allow_fallbacks: false,
+      data_collection: "deny",
+      zdr: true,
+    });
+  });
+
   test("composes a caller abort signal with the timeout signal", async () => {
     const caller = new AbortController();
 

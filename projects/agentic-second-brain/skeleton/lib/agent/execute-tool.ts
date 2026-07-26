@@ -116,10 +116,10 @@ export async function executeToolCall(
     return rejected("unsafe_path", "unsafe note path.");
   }
 
+  const duplicate = context.uniqueNoteReads.has(path);
+  if (!duplicate) context.uniqueNoteReads.add(path);
   try {
-    const duplicate = context.uniqueNoteReads.has(path);
     const note = await context.readNote(path);
-    context.uniqueNoteReads.add(path);
     return {
       ok: true,
       name,
@@ -128,6 +128,7 @@ export async function executeToolCall(
       duplicate,
     };
   } catch {
+    if (!duplicate) context.uniqueNoteReads.delete(path);
     return {
       ok: false,
       code: "missing_note",

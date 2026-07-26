@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
+import path from "node:path";
 import { z } from "zod";
 
+import { runAgent } from "@/lib/agent/controller";
 import type { ChatResponse } from "@/lib/contracts";
 import {
   ModelAdapterError,
   createChatCompletion,
   type ModelErrorCode,
 } from "@/lib/model/openrouter";
-import { buildAllContext } from "@/lib/vault/all-context";
+import { resolveVaultConfig } from "@/lib/vault/config";
 import { loadVault } from "@/lib/vault/load-vault";
 
 const maxRequestBytes = 160_000;
@@ -152,49 +154,48 @@ export async function POST(request: Request) {
   }
 
   try {
-    const notes = await loadVault();
-    const context = buildAllContext(notes);
-    const completion = await createChatCompletion({
-      model: process.env.OPENROUTER_MODEL ?? "openrouter/free",
-      messages: [
-        { role: "system", content: context.text },
-        ...parsed.data.messages,
-      ],
-      signal: request.signal,
-    });
-
-    if (
-      typeof completion.message.content !== "string" ||
-      !completion.message.content.trim()
-    ) {
-      throw new ModelAdapterError(
-        "invalid_response",
-        "OpenRouter returned an invalid response.",
+    let vaultConfig;
+    try {
+      vaultConfig = resolveVaultConfig();
+    } catch {
+      return errorResponse(
+        "unsafe_personal_vault_configuration",
+        "Personal vault mode is not safely configured.",
+        400,
       );
     }
+    const vaultRoot = vaultConfig.personal
+      ? path.join(/* turbopackIgnore: true */ process.cwd(), "vault-personal")
+      : path.join(process.cwd(), "vault");
+    const notes = await loadVault(vaultRoot);
+    const result = await runAgent(
+      {
+        messages: parsed.data.messages,
+        notes,
+        model: process.env.OPENROUTER_MODEL ?? "openrouter/free",
+        fallbackModel: process.env.OPENROUTER_FALLBACK_MODEL ?? "",
+        provider: vaultConfig.provider,
+        signal: request.signal,
+      },
+      {
+        complete: createChatCompletion,
+      },
+    );
 
     const response: ChatResponse = {
       mode: "baseline",
-      answer: completion.message.content,
-      model: completion.model,
-      restarted: false,
-      sources: notes.map((note) => note.path),
-      activity: [
-        {
-          type: "context",
-          message: `Sent all ${context.notesSent} notes as context`,
-        },
-      ],
-      usage: {
-        modelCalls: 1,
-        notesSent: context.notesSent,
-        notesRead: 0,
-        contextCharacters: context.contextCharacters,
-      },
+      ...result,
     };
 
     return NextResponse.json(response);
   } catch (error) {
+    if (error instanceof Error && error.message === "invalid_response") {
+      return errorResponse(
+        "invalid_response",
+        "OpenRouter returned an invalid response.",
+        502,
+      );
+    }
     if (error instanceof ModelAdapterError) {
       return errorResponse(
         error.code,

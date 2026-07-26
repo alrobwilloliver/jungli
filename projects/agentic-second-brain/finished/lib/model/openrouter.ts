@@ -57,6 +57,13 @@ export interface ModelCompletion {
   };
 }
 
+export interface ProviderConstraints {
+  only: string[];
+  allow_fallbacks: false;
+  data_collection: "deny";
+  zdr: true;
+}
+
 const errorForStatus = (status: number): ModelAdapterError => {
   if (status === 401) {
     return new ModelAdapterError(
@@ -174,6 +181,7 @@ export async function createChatCompletion(input: {
   model: string;
   messages: ModelMessage[];
   tools?: ModelTool[];
+  provider?: ProviderConstraints;
   signal?: AbortSignal;
 }): Promise<ModelCompletion> {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -225,6 +233,7 @@ export async function createChatCompletion(input: {
         model: input.model,
         messages: input.messages,
         ...(input.tools ? { tools: input.tools } : {}),
+        ...(input.provider ? { provider: input.provider } : {}),
       }),
       signal: requestSignal,
     });
