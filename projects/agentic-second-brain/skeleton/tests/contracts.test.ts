@@ -55,6 +55,7 @@ describe("browser/server chat contracts", () => {
     expect(source).toContain("What is Sam's favorite restaurant?");
     expect(source).toContain('role="alert"');
     expect(source).toContain('href="/setup"');
+    expect(source).toContain("scrollTop");
     expect(source).not.toMatch(/ReadableStream|EventSource|useChat/);
   });
 

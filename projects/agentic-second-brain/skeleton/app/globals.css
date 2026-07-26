@@ -6,7 +6,6 @@
   --marigold: #fbd010;
   --pale-gold: #fce486;
   --sage: #9ac072;
-  --mist: #d8e8c7;
   --content-width: 76rem;
 }
 
@@ -389,12 +388,12 @@ code {
 .error-message {
   margin: 1rem 1.25rem 0;
   padding: 0.9rem 1rem;
-  border-left: 0.3rem solid #ffbdab;
-  background: rgb(71 20 10 / 72%);
+  border-left: 0.3rem solid var(--marigold);
+  background: var(--jungle-deep);
 }
 
 .error-message strong {
-  color: #ffd4c8;
+  color: var(--marigold);
 }
 
 .error-message p {
@@ -430,7 +429,7 @@ input:disabled {
   border: 1px solid color-mix(in srgb, var(--sage) 55%, transparent);
   border-radius: 999px;
   background: transparent;
-  color: var(--mist);
+  color: var(--cream);
   font-size: 0.78rem;
   text-align: left;
 }
@@ -493,7 +492,7 @@ input:disabled {
   display: grid;
   gap: 0.75rem;
   padding: 1.25rem;
-  color: var(--mist);
+  color: var(--cream);
   font-size: 0.9rem;
 }
 
@@ -573,7 +572,7 @@ input:disabled {
   border: 1px solid color-mix(in srgb, var(--sage) 55%, transparent);
   border-radius: 0.35rem;
   background: var(--jungle-deep);
-  color: var(--mist);
+  color: var(--cream);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.67rem;
   overflow-wrap: anywhere;

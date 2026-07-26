@@ -1,8 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 
-import type { ChatMessage, ChatRequest, ChatResponse } from "@/lib/contracts";
+import { createPendingChatTurn, failPendingChatTurn } from "@/lib/chat-client";
+import type { ChatMessage, ChatResponse } from "@/lib/contracts";
 
 const suggestions = [
   "What measurable growth work has Sam done?",
@@ -35,18 +36,20 @@ export default function HomePage() {
     message: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const transcriptRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const transcript = transcriptRef.current;
+    if (!transcript || (messages.length === 0 && !isLoading)) return;
+
+    transcript.scrollTop = transcript.scrollHeight;
+  }, [isLoading, messages]);
 
   const askQuestion = async (nextQuestion: string) => {
-    const content = nextQuestion.trim();
-    if (!content || isLoading) return;
+    const turn = createPendingChatTurn(messages, nextQuestion);
+    if (!turn || isLoading) return;
 
-    const nextMessages: ChatMessage[] = [
-      ...messages,
-      { role: "user", content },
-    ];
-    const request: ChatRequest = { messages: nextMessages };
-
-    setMessages(nextMessages);
+    setMessages(turn.displayMessages);
     setQuestion("");
     setDiagnostics(null);
     setError(null);
@@ -56,7 +59,7 @@ export default function HomePage() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
+        body: JSON.stringify(turn.request),
       });
       const payload = (await readJson(response)) as
         ChatResponse | ApiError | undefined;
@@ -72,12 +75,13 @@ export default function HomePage() {
       }
 
       const result = payload as ChatResponse;
-      setMessages((current) => [
-        ...current,
+      setMessages([
+        ...turn.displayMessages,
         { role: "assistant", content: result.answer },
       ]);
       setDiagnostics(result);
     } catch (cause) {
+      const rollback = failPendingChatTurn(turn);
       const failure =
         typeof cause === "object" &&
         cause !== null &&
@@ -94,6 +98,8 @@ export default function HomePage() {
               message:
                 "The assistant could not be reached. Check your connection and try again.",
             };
+      setMessages(rollback.messages);
+      setQuestion(rollback.draft);
       setError(failure);
     } finally {
       setIsLoading(false);
@@ -143,6 +149,7 @@ export default function HomePage() {
           </div>
 
           <div
+            ref={transcriptRef}
             className={`transcript ${messages.length === 0 ? "is-empty" : ""}`}
             aria-live="polite"
             aria-busy={isLoading}
