@@ -132,8 +132,10 @@ describe("POST /api/chat", () => {
 
     const payload = await response.json();
     expect(payload).toEqual({
+      mode: "baseline",
       answer: "Sam grew a newsletter.",
       model: "actual/free-model",
+      restarted: false,
       sources: ["career/about-sam.md", "projects/newsletter-growth.md"],
       activity: [
         {
@@ -144,6 +146,7 @@ describe("POST /api/chat", () => {
       usage: {
         modelCalls: 1,
         notesSent: 2,
+        notesRead: 0,
         contextCharacters: expect.any(Number),
       },
     });

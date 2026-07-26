@@ -8,6 +8,26 @@ const finishedFile = (relativePath: string) =>
 const skeletonFile = (relativePath: string) =>
   fileURLToPath(new URL(`../../skeleton/${relativePath}`, import.meta.url));
 
+const sharedClassroomFiles = [
+  "lib/contracts.ts",
+  "lib/agent/tool-schemas.ts",
+  "lib/agent/execute-tool.ts",
+  "app/page.tsx",
+  "app/globals.css",
+  "app/api/chat/route.ts",
+  "tests/contracts.test.ts",
+  "tests/chat-route.test.ts",
+  "tests/tool-schemas.test.ts",
+] as const;
+
+const vaultFixtures = [
+  "vault/career/about-sam.md",
+  "vault/career/skills-marketing.md",
+  "vault/index.md",
+  "vault/projects/newsletter-growth.md",
+  "vault/projects/self-serve-launch.md",
+] as const;
+
 const expectedDependencies = {
   "gray-matter": "4.0.3",
   next: "16.2.11",
@@ -65,4 +85,16 @@ describe("skeleton and finished project parity", () => {
 
     expect(finished).toBe(skeleton);
   });
+
+  test.each([...sharedClassroomFiles, ...vaultFixtures])(
+    "keeps classroom file %s identical",
+    async (relativePath) => {
+      const [skeleton, finished] = await Promise.all([
+        readFile(skeletonFile(relativePath), "utf8"),
+        readFile(finishedFile(relativePath), "utf8"),
+      ]);
+
+      expect(finished).toBe(skeleton);
+    },
+  );
 });

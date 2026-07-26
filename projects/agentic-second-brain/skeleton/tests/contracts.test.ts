@@ -27,13 +27,16 @@ describe("browser/server chat contracts", () => {
       { type: "context", message: "Sent all 5 notes as context" },
     ];
     const response: ChatResponse = {
+      mode: "baseline",
       answer: "Sam grew the newsletter.",
       model: "provider/actual-free-model",
+      restarted: false,
       sources: ["projects/newsletter-growth.md"],
       activity,
       usage: {
         modelCalls: 1,
         notesSent: 5,
+        notesRead: 0,
         contextCharacters: 4_321,
       },
     };
@@ -42,16 +45,21 @@ describe("browser/server chat contracts", () => {
     expect(JSON.parse(JSON.stringify(response))).toEqual(response);
   });
 
-  test("the baseline client exposes its teaching state and uses non-streaming fetch", async () => {
+  test("the client exposes both teaching modes and complete diagnostics", async () => {
     const source = await readFile(projectFile("app/page.tsx"), "utf8");
 
     expect(source).toContain('"use client"');
+    expect(source).toContain('diagnostics?.mode ?? "baseline"');
+    expect(source).toContain("Agentic");
     expect(source).toContain("Non-agentic baseline");
     expect(source).toContain("all five notes");
     expect(source).toContain('fetch("/api/chat"');
     expect(source).toContain("Model calls");
     expect(source).toContain("Notes sent");
+    expect(source).toContain("Notes read");
     expect(source).toContain("Context characters");
+    expect(source).toContain("Restarted");
+    expect(source).toContain("Sources");
     expect(source).toContain("What is Sam's favorite restaurant?");
     expect(source).toContain('role="alert"');
     expect(source).toContain('href="/setup"');

@@ -174,8 +174,10 @@ export async function POST(request: Request) {
     }
 
     const response: ChatResponse = {
+      mode: "baseline",
       answer: completion.message.content,
       model: completion.model,
+      restarted: false,
       sources: notes.map((note) => note.path),
       activity: [
         {
@@ -186,6 +188,7 @@ export async function POST(request: Request) {
       usage: {
         modelCalls: 1,
         notesSent: context.notesSent,
+        notesRead: 0,
         contextCharacters: context.contextCharacters,
       },
     };

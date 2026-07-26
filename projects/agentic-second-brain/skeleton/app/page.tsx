@@ -37,6 +37,7 @@ export default function HomePage() {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const transcriptRef = useRef<HTMLDivElement>(null);
+  const mode = diagnostics?.mode ?? "baseline";
 
   useEffect(() => {
     const transcript = transcriptRef.current;
@@ -115,7 +116,9 @@ export default function HomePage() {
     <article className="chat-page">
       <header className="chat-intro">
         <div>
-          <p className="baseline-badge">Non-agentic baseline</p>
+          <p className={`mode-badge ${mode}`}>
+            {mode === "agentic" ? "Agentic" : "Non-agentic baseline"}
+          </p>
           <h1>Ask Sam&apos;s second brain</h1>
           <p className="lede">
             This starting version sends all five notes to the model on every
@@ -273,6 +276,14 @@ export default function HomePage() {
                   <dd>{diagnostics.usage.notesSent}</dd>
                 </div>
                 <div>
+                  <dt>Notes read</dt>
+                  <dd>{diagnostics.usage.notesRead}</dd>
+                </div>
+                <div>
+                  <dt>Restarted</dt>
+                  <dd>{diagnostics.restarted ? "Yes" : "No"}</dd>
+                </div>
+                <div>
                   <dt>Context characters</dt>
                   <dd>
                     ≈ {diagnostics.usage.contextCharacters.toLocaleString()}
@@ -281,7 +292,7 @@ export default function HomePage() {
               </dl>
 
               <div className="sources">
-                <h3>Sources sent</h3>
+                <h3>Sources</h3>
                 <div className="source-list">
                   {diagnostics.sources.map((source) => (
                     <span className="source-chip" key={source}>
@@ -304,6 +315,10 @@ export default function HomePage() {
                 </div>
                 <div>
                   <dt>Notes sent</dt>
+                  <dd>—</dd>
+                </div>
+                <div>
+                  <dt>Notes read</dt>
                   <dd>—</dd>
                 </div>
                 <div>

@@ -13,13 +13,16 @@ export interface ActivityEvent {
 }
 
 export interface ChatResponse {
+  mode: "baseline" | "agentic";
   answer: string;
   model: string;
+  restarted: boolean;
   sources: string[];
   activity: ActivityEvent[];
   usage: {
     modelCalls: number;
     notesSent: number;
+    notesRead: number;
     contextCharacters: number;
   };
 }
