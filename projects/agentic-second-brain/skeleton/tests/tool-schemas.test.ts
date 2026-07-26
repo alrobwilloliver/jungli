@@ -84,6 +84,42 @@ describe("note tool definitions", () => {
       NOTE_TOOL_VALIDATORS.list_notes.parse({ unknown: "projects" }),
     ).toThrow();
   });
+
+  test.each([
+    ["list_notes", "folder", 240, 0],
+    ["search_notes", "query", 300, 1],
+    ["read_note", "path", 500, 2],
+  ] as const)(
+    "%s applies the same raw bounds and non-whitespace rule in JSON Schema and Zod",
+    (name, field, maxLength, definitionIndex) => {
+      const definition = NOTE_TOOL_DEFINITIONS[definitionIndex];
+      const validator = NOTE_TOOL_VALIDATORS[name];
+
+      expect(definition.function.parameters).toMatchObject({
+        properties: {
+          [field]: {
+            minLength: 1,
+            maxLength,
+            pattern: "\\S",
+          },
+        },
+      });
+      expect(validator.parse({ [field]: `  value  ` })).toEqual({
+        [field]: "value",
+      });
+      expect(validator.parse({ [field]: "x".repeat(maxLength) })).toEqual({
+        [field]: "x".repeat(maxLength),
+      });
+      expect(() => validator.parse({ [field]: "" })).toThrow();
+      expect(() => validator.parse({ [field]: " \n\t " })).toThrow();
+      expect(() =>
+        validator.parse({ [field]: "x".repeat(maxLength + 1) }),
+      ).toThrow();
+      expect(() =>
+        validator.parse({ [field]: `${"x".repeat(maxLength)} ` }),
+      ).toThrow();
+    },
+  );
 });
 
 describe("executeToolCall", () => {

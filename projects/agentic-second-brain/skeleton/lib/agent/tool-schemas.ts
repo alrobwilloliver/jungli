@@ -4,21 +4,32 @@ import type { ModelTool } from "@/lib/model/openrouter";
 
 export type KnownToolName = "list_notes" | "search_notes" | "read_note";
 
+const normalizedString = (maxLength: number) =>
+  z
+    .string()
+    .min(1)
+    .max(maxLength)
+    .refine(
+      (value) => /\S/.test(value),
+      "Must contain a non-whitespace character.",
+    )
+    .transform((value) => value.trim());
+
 const listNotesArguments = z
   .object({
-    folder: z.string().min(1).max(240).optional(),
+    folder: normalizedString(240).optional(),
   })
   .strict();
 
 const searchNotesArguments = z
   .object({
-    query: z.string().trim().min(1).max(300),
+    query: normalizedString(300),
   })
   .strict();
 
 const readNoteArguments = z
   .object({
-    path: z.string().min(1).max(500),
+    path: normalizedString(500),
   })
   .strict();
 
@@ -41,6 +52,7 @@ export const NOTE_TOOL_DEFINITIONS: ModelTool[] = [
             type: "string",
             minLength: 1,
             maxLength: 240,
+            pattern: "\\S",
             description: "Exact vault folder to list.",
           },
         },
@@ -61,6 +73,7 @@ export const NOTE_TOOL_DEFINITIONS: ModelTool[] = [
             type: "string",
             minLength: 1,
             maxLength: 300,
+            pattern: "\\S",
             description: "Words to search for in the vault.",
           },
         },
@@ -81,6 +94,7 @@ export const NOTE_TOOL_DEFINITIONS: ModelTool[] = [
             type: "string",
             minLength: 1,
             maxLength: 500,
+            pattern: "\\S",
             description: "Exact allowlisted path of the note to read.",
           },
         },

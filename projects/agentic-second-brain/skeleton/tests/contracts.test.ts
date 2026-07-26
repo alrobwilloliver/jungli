@@ -25,6 +25,11 @@ describe("browser/server chat contracts", () => {
     };
     const activity: ActivityEvent[] = [
       { type: "context", message: "Sent all 5 notes as context" },
+      { type: "search", message: "Searched notes" },
+      { type: "read", message: "Read a note" },
+      { type: "answer", message: "Answered from evidence" },
+      { type: "restart", message: "Restarted once" },
+      { type: "error", message: "Stopped safely" },
     ];
     const response: ChatResponse = {
       mode: "baseline",
@@ -45,14 +50,16 @@ describe("browser/server chat contracts", () => {
     expect(JSON.parse(JSON.stringify(response))).toEqual(response);
   });
 
-  test("the client exposes both teaching modes and complete diagnostics", async () => {
+  test("the client uses the shared mode presentation and complete diagnostics", async () => {
     const source = await readFile(projectFile("app/page.tsx"), "utf8");
 
     expect(source).toContain('"use client"');
-    expect(source).toContain('diagnostics?.mode ?? "baseline"');
-    expect(source).toContain("Agentic");
-    expect(source).toContain("Non-agentic baseline");
-    expect(source).toContain("all five notes");
+    expect(source).toContain("getModePresentation");
+    expect(source).toContain("diagnostics?.mode");
+    expect(source).toContain("presentation.badge");
+    expect(source).toContain("presentation.description");
+    expect(source).toContain("presentation.flow");
+    expect(source).toContain("presentation.loading");
     expect(source).toContain('fetch("/api/chat"');
     expect(source).toContain("Model calls");
     expect(source).toContain("Notes sent");
@@ -65,6 +72,7 @@ describe("browser/server chat contracts", () => {
     expect(source).toContain('href="/setup"');
     expect(source).toContain("scrollTop");
     expect(source).not.toMatch(/ReadableStream|EventSource|useChat/);
+    expect(source).not.toContain("Sending all five notes and waiting");
   });
 
   test("setup only uses an absolute repository URL for the model guide", async () => {

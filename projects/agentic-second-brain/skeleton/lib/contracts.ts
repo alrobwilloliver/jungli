@@ -8,7 +8,7 @@ export interface ChatRequest {
 }
 
 export interface ActivityEvent {
-  type: "context";
+  type: "context" | "search" | "read" | "answer" | "restart" | "error";
   message: string;
 }
 

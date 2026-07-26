@@ -223,6 +223,12 @@ code {
   color: var(--sage);
 }
 
+.mode-badge.neutral {
+  border-color: var(--sage);
+  background: color-mix(in srgb, var(--sage) 9%, transparent);
+  color: var(--sage);
+}
+
 .flow-card {
   display: flex;
   flex-wrap: wrap;

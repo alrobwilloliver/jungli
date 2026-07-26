@@ -10,6 +10,7 @@ const peerFile = (relativePath: string) =>
 
 const sharedFiles = [
   "lib/contracts.ts",
+  "lib/mode-presentation.ts",
   "lib/agent/tool-schemas.ts",
   "lib/agent/execute-tool.ts",
   "app/page.tsx",
@@ -18,6 +19,7 @@ const sharedFiles = [
   "tests/contracts.test.ts",
   "tests/chat-route.test.ts",
   "tests/tool-schemas.test.ts",
+  "tests/mode-presentation.test.ts",
 ] as const;
 
 const vaultFixtures = [

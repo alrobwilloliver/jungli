@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 
 import { createPendingChatTurn, failPendingChatTurn } from "@/lib/chat-client";
 import type { ChatMessage, ChatResponse } from "@/lib/contracts";
+import { getModePresentation } from "@/lib/mode-presentation";
 
 const suggestions = [
   "What measurable growth work has Sam done?",
@@ -37,7 +38,7 @@ export default function HomePage() {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const transcriptRef = useRef<HTMLDivElement>(null);
-  const mode = diagnostics?.mode ?? "baseline";
+  const presentation = getModePresentation(diagnostics?.mode, isLoading);
 
   useEffect(() => {
     const transcript = transcriptRef.current;
@@ -116,23 +117,19 @@ export default function HomePage() {
     <article className="chat-page">
       <header className="chat-intro">
         <div>
-          <p className={`mode-badge ${mode}`}>
-            {mode === "agentic" ? "Agentic" : "Non-agentic baseline"}
+          <p className={`mode-badge ${presentation.mode}`}>
+            {presentation.badge}
           </p>
           <h1>Ask Sam&apos;s second brain</h1>
-          <p className="lede">
-            This starting version sends all five notes to the model on every
-            message. Watch the activity and context counters—we will make that
-            behavior agentic in the next build.
-          </p>
+          <p className="lede">{presentation.description}</p>
         </div>
 
         <div className="flow-card" aria-label="Current request flow">
-          <span>Question</span>
+          <span>{presentation.flow[0]}</span>
           <span aria-hidden="true">→</span>
-          <span>Every note</span>
+          <span>{presentation.flow[1]}</span>
           <span aria-hidden="true">→</span>
-          <span>One answer</span>
+          <span>{presentation.flow[2]}</span>
         </div>
       </header>
 
@@ -184,7 +181,7 @@ export default function HomePage() {
             {isLoading && (
               <p className="loading-status">
                 <span aria-hidden="true" className="loading-dot" />
-                Sending all five notes and waiting for the model…
+                {presentation.loading}
               </p>
             )}
           </div>
