@@ -64,16 +64,20 @@ ONLY that context. If the answer isn't there, say so.
 **Talking points:**
 - An **API** = asking another service (here, the AI model) to do something for you.
 - An **API key** = your password to that service. Keep it secret.
-- We use a **free OpenRouter model** — so the key is **free** (no cost barrier),
-  but the secret-handling is identical. Get one via `MODEL-SETUP.md`.
+- Learners create **one free OpenRouter key** and set the model to exactly
+  **`openrouter/free`**. OpenRouter chooses an available free model for each
+  request, and the API response includes the actual model used.
+- Response style may vary a little. That is acceptable here because each user
+  message is one independent model call.
 - Store it in an **environment variable** / `.env`; add `.env` to `.gitignore`.
 - ⚠️ **The classic disaster:** committing a key to a public repo — what happens and
   why it's bad.
-- Name the **free-tier limit** out loud: ~50 requests/day per account (failed tries
-  count) — wait, switch `:free` model, or add $10 for 1,000/day.
+- Name the **free-tier limit** out loud: ~50 requests/day per account (**checked
+  July 2026**; failed tries count) — wait or add $10 for 1,000/day. See the
+  [official limits](https://openrouter.ai/docs/api/reference/limits).
 
 **Resources:** [`chat-agent/skeleton/MODEL-SETUP.md`](../../projects/chat-agent/skeleton/MODEL-SETUP.md)
-(free OpenRouter key + `:free` model) · `.env` + `.gitignore` · this deck.
+(free OpenRouter key + `openrouter/free`) · `.env` + `.gitignore` · this deck.
 
 **Practical task:** put your key in `.env`, confirm `.gitignore` excludes it, and
 wire the real call so the chat answers from the context.
@@ -83,9 +87,9 @@ live, and where should it **never** go? ③ What does `.gitignore` do?
 
 **Base prompt (from `PROMPTS.md`):**
 ```
-Put the LLM API key in an environment variable in a .env file. Add .env to
-.gitignore so it is never committed. Read the key from the environment in code —
-never hardcode it.
+Set the model to exactly "openrouter/free". Put the OpenRouter API key in an
+OPENROUTER_API_KEY variable in a .env file. Add .env to .gitignore so it is never
+committed. Read the key from the environment in code — never hardcode it.
 ```
 
 ---

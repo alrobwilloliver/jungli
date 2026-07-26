@@ -1,0 +1,39 @@
+{
+  "name": "agentic-second-brain",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:checkpoint:tools": "vitest run --config vitest.checkpoint.config.ts tests/checkpoint-tools.test.ts",
+    "test:checkpoint:controller": "vitest run --config vitest.checkpoint.config.ts tests/checkpoint-controller.test.ts",
+    "check-models": "node --experimental-strip-types scripts/check-models.ts",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "gray-matter": "4.0.3",
+    "next": "16.2.11",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.2.11",
+    "prettier": "3.9.6",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}

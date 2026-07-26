@@ -6,16 +6,17 @@ over. This is the body of context that **Build 3's chat agent answers from.**
 Pairs with Build 2 in [`../../curriculum/lesson-plans.md`](../../curriculum/lesson-plans.md).
 
 Used two ways: the **5-day course** (Build 2, full flow) and the **weekend taster**
-(Day 2 — the gentler *Weekend lite path* at the top of
+(Day 2 — the gentler _Weekend lite path_ at the top of
 [`skeleton/PROMPTS.md`](skeleton/PROMPTS.md)).
 
 > **Two persona angles, same build:**
-> - **Job-seeker** → your *career brain* (CV, projects, history) → feeds your recruiter chat bot.
-> - **Entrepreneur** → your *product brain* (offer, features, FAQ) → feeds your customer chat bot.
+>
+> - **Job-seeker** → your _career brain_ (CV, projects, history) → feeds your recruiter chat bot.
+> - **Entrepreneur** → your _product brain_ (offer, features, FAQ) → feeds your customer chat bot.
 
 ## What it teaches
 
-**Context & memory management** — made concrete. The vault *is* external memory:
+**Context & memory management** — made concrete. The vault _is_ external memory:
 what's not in a file, the agent doesn't know. Learners feel the context window,
 `/clear`, and `CLAUDE.md`-as-standing-memory by managing a real vault.
 
@@ -29,10 +30,13 @@ requirement.
 
 ## What's here
 
-| Folder | What it is |
-|---|---|
+| Folder      | What it is                                                                                                                             |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `skeleton/` | Docs-only starter (`README`, `CLAUDE.md`, `PROMPTS.md`) + a one-note sample `vault/`. Learners build their own brain from the prompts. |
-| `finished/` | A reference "after" — a small worked career brain for the sample persona **Sam Rivera**. |
-| `slides/` | PPT slides to add. |
+| `finished/` | A reference "after" — a small worked career brain for the sample persona **Sam Rivera**.                                               |
+| `slides/`   | PPT slides to add.                                                                                                                     |
 
 The sample persona (Sam Rivera) is shared with Build 3, so the two projects connect.
+
+Optional next step: turn this vault into a bounded tool-using app in the
+[Agentic Second Brain class](../agentic-second-brain/README.md).

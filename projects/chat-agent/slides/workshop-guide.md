@@ -131,18 +131,34 @@ This is the real lesson of the day.
 - An **API key** = your **password** to that service. Ours is a **free OpenRouter**
   key (no card), but it's tied to your account, so it still stays **secret**.
 
-**Get a free key first:** [`MODEL-SETUP.md`](../skeleton/MODEL-SETUP.md) — a free
-OpenRouter account, an API key, and a `:free` model. Then wire it in safely:
+**Get a free key first:** [`MODEL-SETUP.md`](../skeleton/MODEL-SETUP.md) — create
+one free OpenRouter key, then set the model to exactly **`openrouter/free`**.
+OpenRouter selects an available free model for each request, and the API response
+includes the actual model used. Response style may vary a little; that is fine
+because each user message here is one independent model call.
+
+---
+
+## Wire the key safely
 
 ```text
-Put the OpenRouter API key in an OPENROUTER_API_KEY variable in a .env file. Add .env to .gitignore so it is never committed. Read the key from the environment in code — never hardcode it.
+Set the model to exactly "openrouter/free".
+Put the OpenRouter API key in an OPENROUTER_API_KEY
+variable in a .env file. Add .env to .gitignore so it
+is never committed. Read the key from the environment
+in code — never hardcode it.
 ```
 
 `.env` holds the secret · `.gitignore` keeps it off GitHub.
 
+---
+
+## Never commit a key
+
 > **⚠️ The classic disaster — never commit a key.** A key pushed to a public repo
-> is in Git history **forever**, and bots scan public repos for keys and **run up
-> your bill**. If you ever leak one, **revoke it immediately** and make a new one.
+> is in Git history **forever**, and bots scan public repos for keys and can
+> **exhaust your quota or spend credits on your account**. If you ever leak one,
+> **revoke it immediately** and make a new one.
 > `.env` + `.gitignore`, every time — no exceptions.
 
 ---
@@ -171,9 +187,11 @@ Deploy to Vercel. Add the API key as an environment variable in the Vercel proje
 > **The key lives in Vercel's settings — never in the code you push.**
 
 **Cost & limits:** every chat message is a real **API call**. On OpenRouter's free
-tier that's **~50 requests/day** per account (failed tries count) — plenty to build
-today. Hit the wall? Wait for the reset, switch `:free` model, or add **$10 of
-credits** for 1,000/day. It's separate from your Claude plan; details in
+tier that's **~50 requests/day** per account (**checked July 2026**; failed tries
+count) — plenty to build today. Hit the wall? Wait for the reset or add **$10 of
+credits** for 1,000/day. See the
+[official limits](https://openrouter.ai/docs/api/reference/limits). It's separate
+from your Claude plan; details in
 [`MODEL-SETUP.md`](../skeleton/MODEL-SETUP.md).
 
 ---
@@ -197,10 +215,22 @@ Read the files in sample-persona/. Summarise what you know about this person so 
 Build a simple one-page web app with a chat box. When the user sends a message, call the LLM with the documents in sample-persona/ as context, and answer using ONLY that context. If the answer isn't there, say so.
 ```
 
+---
+
+## 8. Prompt reference *(continued)*
+
 **Wire the API key safely** (free OpenRouter key — see `MODEL-SETUP.md`)
 ```text
-Put the OpenRouter API key in an OPENROUTER_API_KEY variable in a .env file. Add .env to .gitignore so it is never committed. Read the key from the environment in code — never hardcode it.
+Set the model to exactly "openrouter/free".
+Put the OpenRouter API key in an OPENROUTER_API_KEY
+variable in a .env file. Add .env to .gitignore so it
+is never committed. Read the key from the environment
+in code — never hardcode it.
 ```
+
+---
+
+## 8. Prompt reference *(continued)*
 
 **Add the fit-assessment**
 ```text

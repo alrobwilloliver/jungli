@@ -19,27 +19,33 @@ lesson is real — it's just a **free** one.*
   **Create Key** → give it a name.
 - **Copy it now** and keep it safe — it's shown once. This is a **secret**.
 
-## 3. Pick a free model
-- Go to **[openrouter.ai/models](https://openrouter.ai/models)** and filter to
-  **free** (price $0) — free models have an ID ending in **`:free`**.
-- Copy the model **ID** (it looks like `provider/model-name:free`).
-- Free models come and go, so pick a **current** one — your instructor will suggest
-  a good default on the day.
+## 3. Use the free router
+Set the app's model to exactly:
+
+```text
+openrouter/free
+```
+
+You do not need to choose a particular model. For each request, OpenRouter selects
+one of the free models currently available. The API response includes the actual
+model used. Answers may vary a little in style because a different model can answer
+the next request — that is fine for this build, where each user message is one
+independent model call.
 
 ## 4. Wire it into your app
 OpenRouter is **OpenAI-compatible**, so this is one prompt to Claude Code:
 
 ```text
-Wire my chat app to OpenRouter's free tier. Use their OpenAI-compatible API at https://openrouter.ai/api/v1, read the key from an OPENROUTER_API_KEY variable in a .env file, add .env to .gitignore, and use the free model "[paste your :free model id]". Answer using ONLY the context, and say so if it isn't there.
+Wire my chat app to OpenRouter's free tier. Use their OpenAI-compatible API at https://openrouter.ai/api/v1, read the key from an OPENROUTER_API_KEY variable in a .env file, add .env to .gitignore, and set the model to exactly "openrouter/free". Answer using ONLY the context, and say so if it isn't there.
 ```
 
 ## 5. Mind the free limits
 The free tier is generous enough to build on, but not unlimited:
 
 - **~50 requests/day** and **~20/minute** per account. **Failed attempts count too.**
-- Hit the wall? **Wait** for the reset, **switch** to another `:free` model, or add
-  **$10 of credits** to raise the daily limit to **1,000**.
-- Popular free models get busy at peak — keep a **second `:free` model ID** handy.
+- Hit the wall? **Wait** for the reset or add **$10 of credits** to raise the daily
+  limit to **1,000**.
+- Free-model availability changes. `openrouter/free` handles that choice for you.
 
 > **🔑 Free, but still a secret.** The key is tied to *your* account and limits.
 > Never commit it: `.env` + `.gitignore`. When you deploy, put it in **Vercel's
@@ -52,9 +58,9 @@ The free tier is generous enough to build on, but not unlimited:
 | Symptom | Try this |
 |---|---|
 | `401 / unauthorized` | Key missing or mistyped. Check `OPENROUTER_API_KEY` is in `.env` and the code reads it from the environment. |
-| `429 / rate limited` | You hit the 50/day or 20/min cap (failed tries count). Wait for reset, switch `:free` model, or add $10 credits. |
+| `429 / rate limited` | You hit the 50/day or 20/min cap (failed tries count). Wait for reset or add $10 credits. |
 | Empty or off-topic answers | The context may not be reaching the model. Ask Claude Code to *"show me exactly what context you send with each message."* |
 
-*Sources (checked July 2026):* [OpenRouter models](https://openrouter.ai/models) ·
+*Sources (checked July 2026):* [Free Models Router](https://openrouter.ai/docs/guides/routing/routers/free-router) ·
 [API rate limits](https://openrouter.ai/docs/api/reference/limits) ·
 [Quickstart](https://openrouter.ai/docs/quickstart).

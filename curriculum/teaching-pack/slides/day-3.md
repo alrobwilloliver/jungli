@@ -142,8 +142,11 @@ Ask it about **Sam** — and try a question it *can't* know.
 
 - An **API** = asking another service (the AI model) to do something for you.
 - An **API key** = your **password** to that service.
-- We use a **free OpenRouter model** — free key, no card. Still **secret**:
-  it's tied to your account (**~50 messages/day** free).
+- Create **one free OpenRouter key** — no card. Still **secret**:
+  it is tied to your account (**~50 requests/day** free, **checked July 2026**; see
+  [official limits](https://openrouter.ai/docs/api/reference/limits)).
+- Set the model to exactly **`openrouter/free`**. OpenRouter picks an
+  available free model for each request; the response says which one.
 
 Enough to build today — steps in `MODEL-SETUP.md`.
 
@@ -154,12 +157,15 @@ Enough to build today — steps in `MODEL-SETUP.md`.
 ## Wire the key safely
 
 ```text
-Put the OpenRouter API key in a .env file. Add .env to
-.gitignore so it's never committed. Read it from the
-environment — never hardcode it.
+Set the model to exactly "openrouter/free". Put the OpenRouter
+API key in a .env file. Add .env to .gitignore so it's never
+committed. Read it from the environment — never hardcode it.
 ```
 
 `.env` holds the secret · `.gitignore` keeps it off GitHub.
+
+The response style may vary. That is fine: each message is one
+independent model call.
 
 ---
 

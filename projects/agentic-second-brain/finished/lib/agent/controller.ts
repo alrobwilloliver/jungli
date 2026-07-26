@@ -1,0 +1,240 @@
+import type { ActivityEvent, ChatMessage } from "@/lib/contracts";
+import type {
+  ModelCompletion,
+  ModelMessage,
+  ProviderConstraints,
+} from "@/lib/model/openrouter";
+import { listNotes } from "@/lib/vault/list-notes";
+import { readNote } from "@/lib/vault/read-note";
+import { searchNotes } from "@/lib/vault/search-notes";
+import type { VaultNote } from "@/lib/vault/types";
+
+import { executeToolCall } from "./execute-tool";
+import { AGENT_SYSTEM_PROMPT } from "./system-prompt";
+import { NOTE_TOOL_DEFINITIONS } from "./tool-schemas";
+
+export const AGENT_LIMITS = {
+  maxModelCalls: 3,
+  maxUniqueReads: 4,
+  maxQuestionCharacters: 4_000,
+  maxToolResultCharacters: 12_000,
+  maxRecentMessages: 6,
+  timeoutMilliseconds: 25_000,
+} as const;
+
+export interface AgentRunInput {
+  messages: ChatMessage[];
+  notes: VaultNote[];
+  model: string;
+  fallbackModel?: string;
+  provider?: ProviderConstraints;
+  signal?: AbortSignal;
+}
+
+export interface AgentDependencies {
+  complete: (input: {
+    model: string;
+    messages: ModelMessage[];
+    tools: typeof NOTE_TOOL_DEFINITIONS;
+    provider?: ProviderConstraints;
+    signal?: AbortSignal;
+  }) => Promise<ModelCompletion>;
+}
+
+export interface AgentRunResult {
+  mode: "agentic";
+  answer: string;
+  model: string;
+  restarted: boolean;
+  sources: string[];
+  activity: ActivityEvent[];
+  usage: {
+    modelCalls: number;
+    notesSent: number;
+    notesRead: number;
+    contextCharacters: number;
+  };
+}
+
+const fallbackAnswer =
+  "I could not gather enough reliable evidence from the vault to answer.";
+
+export async function runAgent(
+  input: AgentRunInput,
+  deps: AgentDependencies,
+): Promise<AgentRunResult> {
+  const history = input.messages.slice(-AGENT_LIMITS.maxRecentMessages);
+  const latest = history.at(-1);
+  if (
+    latest?.role !== "user" ||
+    !latest.content.trim() ||
+    latest.content.length > AGENT_LIMITS.maxQuestionCharacters
+  ) {
+    throw new Error("invalid_question");
+  }
+
+  const transcript: ModelMessage[] = [
+    { role: "system", content: AGENT_SYSTEM_PROMPT },
+    ...history,
+  ];
+  const uniqueReads = new Set<string>();
+  const sources: string[] = [];
+  const activity: ActivityEvent[] = [];
+  let actualModel = input.model;
+  let modelCalls = 0;
+  let restarted = false;
+  let pinnedModel: string | undefined;
+
+  for (; modelCalls < AGENT_LIMITS.maxModelCalls;) {
+    let completion: ModelCompletion;
+    try {
+      modelCalls += 1;
+      completion = await deps.complete({
+        model: actualModel,
+        messages: transcript,
+        tools: NOTE_TOOL_DEFINITIONS,
+        provider: input.provider,
+        signal: input.signal,
+      });
+    } catch (error) {
+      if (
+        modelCalls === 1 &&
+        !restarted &&
+        !uniqueReads.size &&
+        input.fallbackModel
+      ) {
+        actualModel = input.fallbackModel;
+        restarted = true;
+        activity.push({
+          type: "restart",
+          message: "Restarted with fallback model",
+        });
+        continue;
+      }
+      throw error;
+    }
+
+    if (!pinnedModel) {
+      pinnedModel = completion.model;
+      actualModel = pinnedModel;
+    } else if (completion.model !== pinnedModel) {
+      throw new Error("model_identity_changed");
+    }
+
+    const message = completion.message;
+    const toolCalls = message.tool_calls ?? [];
+    if (!toolCalls.length) {
+      const answer = message.content?.trim() || fallbackAnswer;
+      activity.push({
+        type: "answer",
+        message: `Answered from ${sources.length} ${
+          sources.length === 1 ? "note" : "notes"
+        }`,
+      });
+      return {
+        mode: "agentic",
+        answer,
+        model: actualModel,
+        restarted,
+        sources,
+        activity,
+        usage: {
+          modelCalls,
+          notesSent: 0,
+          notesRead: uniqueReads.size,
+          contextCharacters: transcript.reduce(
+            (sum, item) => sum + (item.content?.length ?? 0),
+            0,
+          ),
+        },
+      };
+    }
+
+    transcript.push({
+      role: "assistant",
+      content: message.content,
+      tool_calls: toolCalls,
+    });
+    const results = await Promise.all(
+      toolCalls.map((call) =>
+        executeToolCall(call, {
+          listNotes: (folder) => listNotes(input.notes, folder),
+          searchNotes: (query) => searchNotes(input.notes, query),
+          readNote: (path) => {
+            return readNote(input.notes, path);
+          },
+          uniqueNoteReads: uniqueReads,
+          maxUniqueNoteReads: AGENT_LIMITS.maxUniqueReads,
+        }),
+      ),
+    );
+    results.forEach((result, index) => {
+      const call = toolCalls[index]!;
+      const output = result.output.slice(
+        0,
+        AGENT_LIMITS.maxToolResultCharacters,
+      );
+      transcript.push({
+        role: "tool",
+        name: call.function.name,
+        tool_call_id: call.id,
+        content: output,
+      });
+      if (result.ok) {
+        if (result.name === "search_notes") {
+          const parsedArguments = JSON.parse(call.function.arguments) as {
+            query: string;
+          };
+          activity.push({
+            type: "search",
+            message: `Searching notes for "${parsedArguments.query}"`,
+          });
+        } else if (result.name === "read_note" && result.readPath) {
+          activity.push({
+            type: "read",
+            message: result.duplicate
+              ? `Already read ${result.readPath}`
+              : `Reading ${result.readPath}`,
+          });
+        } else {
+          activity.push({ type: "search", message: "Listing notes" });
+        }
+        if (
+          result.readPath &&
+          !result.duplicate &&
+          !sources.includes(result.readPath)
+        ) {
+          sources.push(result.readPath);
+        }
+      } else {
+        activity.push({ type: "error", message: result.output });
+      }
+    });
+  }
+
+  return {
+    mode: "agentic",
+    answer: fallbackAnswer,
+    model: actualModel,
+    restarted,
+    sources,
+    activity: [
+      ...activity,
+      {
+        type: "answer",
+        message: `Answered from ${sources.length} ${
+          sources.length === 1 ? "note" : "notes"
+        }`,
+      },
+    ],
+    usage: {
+      modelCalls,
+      notesSent: 0,
+      notesRead: uniqueReads.size,
+      contextCharacters: transcript.reduce(
+        (sum, item) => sum + (item.content?.length ?? 0),
+        0,
+      ),
+    },
+  };
+}
