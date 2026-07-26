@@ -143,35 +143,92 @@ vector storage.
 - Modify: both `lib/contracts.ts`
 - Modify: both `app/page.tsx`
 - Modify: both `app/globals.css`
-- Modify: both `package.json`
-- Modify: both `vitest.config.ts`
-- Modify: both `tsconfig.json`
-- Create: skeleton `lib/vault/{list-notes,search-notes,read-note}.ts`
-- Create: skeleton `lib/agent/{tool-schemas,execute-tool}.ts`
-- Create: skeleton `tests/checkpoint-tools.test.ts`
-- Create: skeleton `tests/checkpoint-controller.test.ts`
+- Create: both `lib/agent/{tool-schemas,execute-tool}.ts`
+- Create: both `tests/tool-schemas.test.ts`
 - Create: both `tests/project-parity.test.ts`
 
 - [ ] **Step 1: Write failing parity and contract tests**
 
 Assert identical public contract fields, UI activity/source/usage fields, vault
-fixtures, module paths, controller signature, and checkpoint filenames.
+fixtures, and the frozen schema/dispatcher exports. Align the interrupted
+finished test with the frozen API, then copy the same behavioral test to
+skeleton. The schemas and validated dispatcher are prepared support code, not
+learner work.
 
 - [ ] **Step 2: Verify RED**
 
 ```bash
-npm --prefix projects/agentic-second-brain/skeleton test -- tests/project-parity.test.ts
+npm --prefix projects/agentic-second-brain/skeleton test -- \
+  tests/project-parity.test.ts tests/tool-schemas.test.ts
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/tool-schemas.test.ts
 ```
 
-Expected: FAIL because skeleton lacks the learner seams and shared contract.
+Expected: both fail because the prepared support modules are absent.
 
-- [ ] **Step 3: Add typed skeleton stubs**
+- [ ] **Step 3: Implement identical prepared support**
 
-Create the same named exports as finished. Each learner function throws a
-classified `checkpoint_not_implemented` error. Do not include completed
-algorithm bodies or finished tool dispatch logic in skeleton.
+Implement the strict three schemas and complete validated closed dispatcher in
+both projects using the frozen API. Dispatch only to imported deterministic
+tool functions. The skeleton functions do not exist until Task 2, so its
+dispatcher accepts them through `ToolExecutionContext` dependencies rather
+than importing completed implementations. Label all results as untrusted
+evidence.
 
-- [ ] **Step 4: Isolate checkpoint tests**
+- [ ] **Step 4: Prepare the shared dual-mode UI**
+
+Render baseline or agentic badges from `response.mode`; always support activity,
+sources, model, restart, model calls, notes sent/read, and context characters.
+Keep existing loading, rollback, history bounds, errors, and accessibility.
+
+- [ ] **Step 5: Verify both projects are green**
+
+```bash
+npm --prefix projects/agentic-second-brain/skeleton test
+npm --prefix projects/agentic-second-brain/skeleton run format:check
+npm --prefix projects/agentic-second-brain/skeleton run lint
+npm --prefix projects/agentic-second-brain/skeleton run typecheck
+npm --prefix projects/agentic-second-brain/skeleton run build
+npm --prefix projects/agentic-second-brain/finished test
+npm --prefix projects/agentic-second-brain/finished run format:check
+npm --prefix projects/agentic-second-brain/finished run lint
+npm --prefix projects/agentic-second-brain/finished run typecheck
+npm --prefix projects/agentic-second-brain/finished run build
+```
+
+Expected: all exit 0, including the previously red tool-schema test.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add projects/agentic-second-brain/skeleton projects/agentic-second-brain/finished
+git commit -m "chore: add one-hour classroom support"
+```
+
+### Task 2: Prepare the three-function learner checkpoint
+
+**Files:**
+- Modify: both `package.json`
+- Modify: both `vitest.config.ts`
+- Modify: both `tsconfig.json`
+- Create: skeleton `lib/vault/{list-notes,search-notes,read-note}.ts`
+- Create: both `tests/checkpoint-tools.test.ts`
+- Create: both `vitest.checkpoint.config.ts`
+- Modify: both `tests/project-parity.test.ts`
+
+- [ ] **Step 1: Write the checkpoint test**
+
+Use the same fixtures and assertions in both projects: metadata-only listing;
+title > tag/folder > body ranking; five-result and 320-character snippet caps;
+exact allowlisted read; unsafe/encoded traversal rejection; and opaque path
+round trips.
+
+- [ ] **Step 2: Add typed skeleton learner stubs**
+
+Create the same named exports as finished. Each of the three skeleton functions
+throws `checkpoint_not_implemented`. Do not include finished algorithms.
+
+- [ ] **Step 3: Isolate checkpoint tests**
 
 Default `npm test` excludes `tests/checkpoint-*.test.ts`. Add:
 
@@ -184,16 +241,10 @@ Default `npm test` excludes `tests/checkpoint-*.test.ts`. Add:
 
 Add `vitest.checkpoint.config.ts`; exclude checkpoint tests from TypeScript's
 default project only if necessary, while keeping the stub modules typechecked.
-Before learner changes, each checkpoint command fails for
-`checkpoint_not_implemented`; the default suite remains green.
+Before learner changes, the skeleton checkpoint fails for
+`checkpoint_not_implemented`; the finished checkpoint passes.
 
-- [ ] **Step 5: Prepare the shared dual-mode UI**
-
-Render baseline or agentic badges from `response.mode`; always support activity,
-sources, model, restart, model calls, notes sent/read, and context characters.
-Keep existing loading, rollback, history bounds, errors, and accessibility.
-
-- [ ] **Step 6: Verify GREEN default and intentional checkpoint RED**
+- [ ] **Step 4: Verify green defaults and checkpoint behavior**
 
 ```bash
 npm --prefix projects/agentic-second-brain/skeleton test
@@ -202,14 +253,7 @@ npm --prefix projects/agentic-second-brain/skeleton run lint
 npm --prefix projects/agentic-second-brain/skeleton run typecheck
 npm --prefix projects/agentic-second-brain/skeleton run build
 npm --prefix projects/agentic-second-brain/skeleton run test:checkpoint:tools
-```
-
-Expected: first five exit 0; final command fails only with
-`checkpoint_not_implemented`.
-
-- [ ] **Step 7: Verify finished remains green**
-
-```bash
+npm --prefix projects/agentic-second-brain/finished run test:checkpoint:tools
 npm --prefix projects/agentic-second-brain/finished test
 npm --prefix projects/agentic-second-brain/finished run format:check
 npm --prefix projects/agentic-second-brain/finished run lint
@@ -217,80 +261,14 @@ npm --prefix projects/agentic-second-brain/finished run typecheck
 npm --prefix projects/agentic-second-brain/finished run build
 ```
 
-Expected: all exit 0.
+Expected: skeleton default checks and every finished command exit 0; skeleton
+checkpoint fails only with `checkpoint_not_implemented`.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add projects/agentic-second-brain/skeleton projects/agentic-second-brain/finished
 git commit -m "chore: add one-hour classroom seams"
-```
-
-### Task 2: Complete and validate the three note tools
-
-**Files:**
-- Modify: finished `lib/agent/tool-schemas.ts`
-- Modify: finished `lib/agent/execute-tool.ts`
-- Test: finished `tests/tool-schemas.test.ts`
-- Test: finished `tests/checkpoint-tools.test.ts`
-- Modify only during rehearsal: skeleton learner-region tool files
-
-- [ ] **Step 1: Align the interrupted test with the frozen API**
-
-Cover exactly three strict definitions, strict Zod arguments, malformed JSON,
-extra arguments, unknown tools, unsafe/missing paths, duplicate reads,
-unique-read accounting, and untrusted evidence labels.
-
-- [ ] **Step 2: Verify RED**
-
-```bash
-npm --prefix projects/agentic-second-brain/finished test -- tests/tool-schemas.test.ts
-```
-
-Expected: FAIL because production modules are absent.
-
-- [ ] **Step 3: Implement strict schemas**
-
-Use `additionalProperties: false`. Arguments:
-
-```ts
-list_notes: { folder?: string }
-search_notes: { query: string /* trimmed, 1..400 */ }
-read_note: { path: string /* 1..500 */ }
-```
-
-- [ ] **Step 4: Implement the closed dispatcher**
-
-Execute only imported deterministic tools. Never resolve a model path against
-the filesystem. Label catalogue/search/read outputs as untrusted evidence.
-Return the frozen result union for every malformed or rejected call.
-
-- [ ] **Step 5: Verify tool GREEN**
-
-```bash
-npm --prefix projects/agentic-second-brain/finished test -- \
-  tests/note-tools.test.ts tests/tool-schemas.test.ts tests/checkpoint-tools.test.ts
-```
-
-Expected: all pass.
-
-- [ ] **Step 6: Run the complete finished gate**
-
-```bash
-npm --prefix projects/agentic-second-brain/finished test
-npm --prefix projects/agentic-second-brain/finished run format:check
-npm --prefix projects/agentic-second-brain/finished run lint
-npm --prefix projects/agentic-second-brain/finished run typecheck
-npm --prefix projects/agentic-second-brain/finished run build
-```
-
-Expected: all exit 0.
-
-- [ ] **Step 7: Commit**
-
-```bash
-git add projects/agentic-second-brain/finished
-git commit -m "feat: define safe note tools for the model"
 ```
 
 ### Task 3: Build the controller in test-first slices
@@ -301,7 +279,8 @@ git commit -m "feat: define safe note tools for the model"
 - Modify: both `app/api/chat/route.ts`
 - Test: both `tests/controller.test.ts`
 - Test: both `tests/chat-route.test.ts`
-- Test: finished `tests/checkpoint-controller.test.ts`
+- Create: both `tests/checkpoint-controller.test.ts`
+- Modify: both `tests/project-parity.test.ts`
 - Remove after finished route conversion: finished `lib/vault/all-context.ts`
 - Remove after finished route conversion: finished `tests/all-context.test.ts`
 
@@ -328,19 +307,29 @@ work inside one marked `LEARNER CHECKPOINT 3` region. Route delegates to
 
 - [ ] **Step 4: Verify Slice A**
 
-Run skeleton full tests, format, lint, typecheck, and build. Expected: all pass.
+```bash
+npm --prefix projects/agentic-second-brain/skeleton test
+npm --prefix projects/agentic-second-brain/skeleton run format:check
+npm --prefix projects/agentic-second-brain/skeleton run lint
+npm --prefix projects/agentic-second-brain/skeleton run typecheck
+npm --prefix projects/agentic-second-brain/skeleton run build
+```
+
+Expected: all exit 0.
 
 #### Slice B: Grounding prompt and one search/read transcript
 
 - [ ] **Step 5: Write finished RED tests**
 
-Assert the prompt says notes are untrusted evidence, note instructions must not
-be followed, claims require successfully returned evidence, paths are cited,
-and insufficient evidence is stated honestly. Include a malicious note fixture
-and an unanswerable question.
+In both projects, assert the prepared prompt says notes are untrusted evidence,
+note instructions must not be followed, claims require successfully returned
+evidence, paths are cited, and insufficient evidence is stated honestly. The
+system prompt is complete prepared support and is never a learner TODO.
 
 Add one transcript: `search_notes` → bounded result → `read_note` → cited
 answer. Assert assistant tool calls and matching results remain ordered.
+Include one-note, two-note, lexical body-match, malicious-note, and absent-answer
+fixtures in the finished controller test.
 
 - [ ] **Step 6: Verify RED**
 
@@ -350,14 +339,22 @@ npm --prefix projects/agentic-second-brain/finished test -- tests/controller.tes
 
 Expected: FAIL because prompt/controller are absent.
 
-- [ ] **Step 7: Implement prompt and one transcript**
+- [ ] **Step 7: Implement identical prompts and one transcript**
 
-Every model call receives all three definitions. Execute only through
-`executeToolCall`.
+Copy the same complete grounding prompt implementation to skeleton and
+finished, then expand the parity test to compare it. Every model call receives
+all three definitions. Execute only through `executeToolCall`.
 
 - [ ] **Step 8: Verify Slice B**
 
-Run the focused controller test. Expected: pass.
+```bash
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/controller.test.ts
+npm --prefix projects/agentic-second-brain/skeleton test -- \
+  tests/project-parity.test.ts
+```
+
+Expected: both exit 0.
 
 #### Slice C: Malformed, unknown, duplicate, and parallel calls
 
@@ -368,7 +365,12 @@ parallel calls.
 
 - [ ] **Step 10: Implement minimal handling and verify GREEN**
 
-Run focused controller tests. Expected: pass.
+```bash
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/controller.test.ts
+```
+
+Expected: exit 0.
 
 #### Slice D: Application bounds and retrieval minimisation
 
@@ -382,7 +384,13 @@ snippets may be present.
 
 - [ ] **Step 12: Implement bounds and verify GREEN**
 
-Run focused controller tests. Expected: pass.
+```bash
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/controller.test.ts
+```
+
+Expected: exit 0 with the one-note, two-note, lexical, absent-answer,
+successful-source-only, bounded-snippet, and unread-body assertions passing.
 
 #### Slice E: Model identity, fallback, and provider failures
 
@@ -394,7 +402,12 @@ unavailable model, incompatible response, and accurate total calls/restart.
 
 - [ ] **Step 14: Implement and verify GREEN**
 
-Run focused controller tests. Expected: pass.
+```bash
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/controller.test.ts
+```
+
+Expected: exit 0.
 
 #### Slice F: Finished route and shared UI contract
 
@@ -408,7 +421,24 @@ model-call/read counts, and friendly error mappings.
 Remove finished all-context production/test files together. The shared UI
 already renders agent fields.
 
-- [ ] **Step 17: Verify both full projects**
+- [ ] **Step 17: Create and verify controller checkpoints**
+
+Both checkpoint tests use the same mocked transcript. Finished passes. Skeleton
+fails only because its marked `LEARNER CHECKPOINT 3` region still returns
+`checkpoint_not_implemented`. Expand parity tests to cover controller
+signature, checkpoint file, prompt, public contracts, UI, fixtures, and vault.
+
+```bash
+npm --prefix projects/agentic-second-brain/finished run \
+  test:checkpoint:controller
+npm --prefix projects/agentic-second-brain/skeleton run \
+  test:checkpoint:controller
+```
+
+Expected: finished exits 0; skeleton fails only with
+`checkpoint_not_implemented`.
+
+- [ ] **Step 18: Verify both full projects**
 
 ```bash
 npm --prefix projects/agentic-second-brain/skeleton test
@@ -425,7 +455,7 @@ npm --prefix projects/agentic-second-brain/finished run build
 
 Expected: all exit 0.
 
-- [ ] **Step 18: Commit**
+- [ ] **Step 19: Commit**
 
 ```bash
 git add projects/agentic-second-brain/skeleton projects/agentic-second-brain/finished
@@ -556,6 +586,8 @@ Assert ordered personal-vault headings/text:
 3. Only then create/copy `vault-personal` and set environment values.
 
 Assert Sam fallback, 60-minute rhythm, and cutovers.
+The same test extracts every relative Markdown link in the new classroom files,
+resolves it from the containing file, and asserts the target exists.
 
 - [ ] **Step 2: Verify RED**
 
@@ -581,20 +613,21 @@ At minute 25, copy only these completed finished files into skeleton:
 lib/vault/list-notes.ts
 lib/vault/search-notes.ts
 lib/vault/read-note.ts
-lib/agent/tool-schemas.ts
-lib/agent/execute-tool.ts
 ```
 
 Provide a cross-platform Claude Code prompt to perform and verify the copy;
-never copy `.env`, vault content, UI, or deployment metadata.
+never copy `.env`, vault content, prepared schemas/dispatcher, UI, or deployment
+metadata.
 
 At minute 45:
 
 ```bash
-npm --prefix projects/agentic-second-brain/finished run dev
+npm --prefix projects/agentic-second-brain/finished run dev -- --port 3001
 ```
 
-Learners open the finished reference and continue the demo.
+Stop the skeleton development server first, or leave it on port 3000 for the
+before comparison. Learners open `http://localhost:3001` for the finished
+reference. Rehearse this exact command and URL.
 
 - [ ] **Step 5: Write model/privacy and instructor guides**
 
@@ -628,8 +661,9 @@ rg -n "vault-personal|PERSONAL_VAULT_POLICY_ACCEPTED|minute 25|minute 45" \
   projects/agentic-second-brain
 ```
 
-Expected: commands exit 0 and required phrases are present. Open every new
-relative Markdown link target.
+Expected: commands exit 0, required phrases are present, and
+`classroom-materials.test.ts` reports every relative Markdown link target
+exists.
 
 - [ ] **Step 9: Commit**
 
@@ -718,7 +752,7 @@ Expected: all exit 0.
 
 ```bash
 git diff --check
-git ls-files | rg '(^|/)(\\.env$|vault-personal/|\\.vercel/)'
+git ls-files | rg '(^|/)(\.env$|vault-personal/|\.vercel/)'
 rg -n "vault-personal" \
   projects/agentic-second-brain/skeleton/next.config.ts \
   projects/agentic-second-brain/finished/next.config.ts
@@ -739,12 +773,21 @@ Classroom-ready requires 45 minutes or less. If a tester is unavailable or time
 exceeds 45 minutes, mark the classroom timing gate `BLOCKED`; do not claim the
 one-hour class is validated.
 
-- [ ] **Step 5: Automate acceptance assertions**
+- [ ] **Step 5: Re-run the automated acceptance matrix**
 
-Tests must cover one-note, two-note, lexical, and absent-answer fixtures;
-successful-read-only sources; every bounded snippet; full raw unread-body
-absence in every request; malicious note instructions; and unsafe personal
-configuration failing before load/model call.
+The assertions were created in Tasks 3 and 4. Run them without adding new
+late-stage behavior:
+
+```bash
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/controller.test.ts tests/chat-route.test.ts tests/vault-config.test.ts
+npm --prefix projects/agentic-second-brain/skeleton test -- \
+  tests/controller.test.ts tests/chat-route.test.ts tests/vault-config.test.ts
+```
+
+Expected: both exit 0, covering one-note, two-note, lexical, absent-answer,
+successful-read-only sources, bounded snippets, unread-body absence, malicious
+note instructions, and unsafe personal configuration before load/model call.
 
 - [ ] **Step 6: Browser-check**
 
@@ -758,9 +801,12 @@ Invoke `superpowers:verification-before-completion` and
 `superpowers:requesting-code-review`. Fix Critical/Important findings with a
 failing regression test first.
 
-- [ ] **Step 8: Commit only if files changed**
+- [ ] **Step 8: Record and commit rehearsal evidence**
 
-If `REHEARSAL.md` or verified corrections changed:
+Always commit `REHEARSAL.md` after an attempted validation. If beginner
+rehearsal is unavailable or exceeds 45 minutes, record `BLOCKED` and the
+evidence without claiming readiness. If verification corrections also changed,
+include them:
 
 ```bash
 git add projects/agentic-second-brain \
@@ -768,8 +814,8 @@ git add projects/agentic-second-brain \
 git commit -m "chore: verify one-hour agentic second brain class"
 ```
 
-Otherwise require `git status --short` to be empty and do not create an empty
-commit.
+If no rehearsal was attempted and no file changed, require
+`git status --short` to be empty and do not create an empty commit.
 
 Do not deploy, push, merge, or remove the worktree in this plan. Those are
 separate handoff decisions after the local classroom build is approved.
