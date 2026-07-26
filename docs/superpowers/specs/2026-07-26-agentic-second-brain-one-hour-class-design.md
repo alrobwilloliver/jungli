@@ -47,6 +47,37 @@ automatic fallback for that run. Learners explicitly choose whether they
 accept that policy. Anyone who declines, or any class without a validated fixed
 provider, completes the lesson with Sam's fictional vault.
 
+The application enforces this boundary rather than relying only on prose. A
+personal-vault run requires all of:
+
+```dotenv
+VAULT_DIRECTORY=vault-personal
+OPENROUTER_MODEL=<fixed model slug>
+OPENROUTER_PROVIDER=<one reviewed provider endpoint slug>
+OPENROUTER_FALLBACK_MODEL=
+PERSONAL_VAULT_POLICY_ACCEPTED=true
+```
+
+For that run, every model request includes an OpenRouter provider constraint
+equivalent to:
+
+```json
+{
+  "only": ["<OPENROUTER_PROVIDER>"],
+  "allow_fallbacks": false,
+  "data_collection": "deny",
+  "zdr": true
+}
+```
+
+The instructor reviews both OpenRouter's current data policy and the selected
+upstream provider's current policy before learners opt in. If the directory is
+personal and any required value is absent, the model is a router alias, a
+fallback is configured, or the provider constraint cannot be applied, the
+server returns `unsafe_personal_vault_configuration` before loading or sending
+any note. A test injects an unsafe configuration and proves the model adapter is
+never called.
+
 ## Project shape
 
 ### Skeleton
@@ -153,9 +184,9 @@ Browser question
   → answer + source paths + observable activity return to the browser
 ```
 
-The browser never receives an API key. Note bodies are never returned by
-`list_notes`, search results remain short, and `read_note` resolves only exact
-paths from the loaded catalogue.
+The browser never receives an API key. Complete raw note bodies are never
+returned by `list_notes`; search may return bounded snippets from candidate
+notes; and `read_note` resolves only exact paths from the loaded catalogue.
 
 ## Error handling
 
@@ -197,9 +228,11 @@ The classroom path is ready only when:
 - Skeleton and finished projects both pass tests, formatting, lint, typecheck,
   and production builds.
 - The skeleton visibly sends all five Sam notes.
-- For the supplied question, only note bodies returned by successful
-  `read_note` calls enter model context. A controller test inspects every model
-  request and proves that unselected note bodies are absent.
+- For the supplied question, no complete raw note body enters model context
+  without a successful `read_note` call. Bounded search snippets are permitted.
+  A controller test inspects every model request, proves the full raw bodies of
+  unread notes are absent, and confirms every search snippet remains within the
+  configured result limit.
 - Tool tests cover ranking, result limits, and unsafe paths.
 - Controller tests cover a normal run, malformed calls, duplicates, limits,
   model pinning, and honest failure.
@@ -210,6 +243,8 @@ The classroom path is ready only when:
   application code or deleting Sam's recovery fixture.
 - The personal-vault instructions present the provider-policy decision before
   asking learners to copy private notes.
+- An automated route/configuration test proves that unsafe personal-vault
+  settings fail before vault loading or any provider request.
 
 The live provider is useful for the final demonstration but is not required to
 prove that the learner completed each coding checkpoint.
