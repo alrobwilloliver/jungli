@@ -13,6 +13,7 @@ const sharedClassroomFiles = [
   "lib/mode-presentation.ts",
   "lib/agent/tool-schemas.ts",
   "lib/agent/execute-tool.ts",
+  "lib/vault/types.ts",
   "app/page.tsx",
   "app/globals.css",
   "app/api/chat/route.ts",
@@ -20,6 +21,14 @@ const sharedClassroomFiles = [
   "tests/chat-route.test.ts",
   "tests/tool-schemas.test.ts",
   "tests/mode-presentation.test.ts",
+  "tests/checkpoint-tools.test.ts",
+  "vitest.checkpoint.config.ts",
+] as const;
+
+const learnerToolFiles = [
+  ["lib/vault/list-notes.ts", "listNotes"],
+  ["lib/vault/search-notes.ts", "searchNotes"],
+  ["lib/vault/read-note.ts", "readNote"],
 ] as const;
 
 const vaultFixtures = [
@@ -99,4 +108,45 @@ describe("skeleton and finished project parity", () => {
       expect(finished).toBe(skeleton);
     },
   );
+
+  test.each(learnerToolFiles)(
+    "keeps the %s learner export available",
+    async (relativePath, exportName) => {
+      const [skeleton, finished] = await Promise.all([
+        readFile(skeletonFile(relativePath), "utf8"),
+        readFile(finishedFile(relativePath), "utf8"),
+      ]);
+
+      expect(skeleton).toMatch(
+        new RegExp(`export function ${exportName}\\s*\\(`),
+      );
+      expect(finished).toMatch(
+        new RegExp(`export function ${exportName}\\s*\\(`),
+      );
+    },
+  );
+
+  test("keeps checkpoint scripts aligned", async () => {
+    const [skeleton, finished] = await Promise.all(
+      [skeletonFile("package.json"), finishedFile("package.json")].map(
+        async (filename) =>
+          JSON.parse(await readFile(filename, "utf8")) as {
+            scripts: Record<string, string>;
+          },
+      ),
+    );
+
+    expect(skeleton.scripts["test:checkpoint:tools"]).toBe(
+      "vitest run --config vitest.checkpoint.config.ts tests/checkpoint-tools.test.ts",
+    );
+    expect(skeleton.scripts["test:checkpoint:controller"]).toBe(
+      "vitest run --config vitest.checkpoint.config.ts tests/checkpoint-controller.test.ts",
+    );
+    expect(finished.scripts["test:checkpoint:tools"]).toBe(
+      skeleton.scripts["test:checkpoint:tools"],
+    );
+    expect(finished.scripts["test:checkpoint:controller"]).toBe(
+      skeleton.scripts["test:checkpoint:controller"],
+    );
+  });
 });

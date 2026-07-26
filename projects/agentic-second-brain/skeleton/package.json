@@ -13,6 +13,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:checkpoint:tools": "vitest run --config vitest.checkpoint.config.ts tests/checkpoint-tools.test.ts",
+    "test:checkpoint:controller": "vitest run --config vitest.checkpoint.config.ts tests/checkpoint-controller.test.ts",
     "test:watch": "vitest"
   },
   "dependencies": {

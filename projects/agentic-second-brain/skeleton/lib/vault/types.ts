@@ -7,3 +7,13 @@ export interface VaultNote {
   body: string;
   characterCount: number;
 }
+
+export type NoteSummary = Pick<
+  VaultNote,
+  "path" | "title" | "folder" | "summary" | "tags"
+>;
+
+export interface NoteSearchResult extends NoteSummary {
+  score: number;
+  snippet: string;
+}
