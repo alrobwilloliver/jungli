@@ -80,11 +80,62 @@ describe("agent controller", () => {
       restarted: false,
       usage: { modelCalls: 3, notesSent: 0, notesRead: 1 },
     });
+    expect(result.activity).toEqual([
+      { type: "search", message: 'Searching notes for "newsletter growth"' },
+      { type: "read", message: "Reading projects/newsletter-growth.md" },
+      { type: "answer", message: "Answered from 1 note" },
+    ]);
     expect(complete).toHaveBeenCalledTimes(3);
     const finalMessages = complete.mock.calls[2][0].messages;
     expect(
       finalMessages.map((message: { role: string }) => message.role),
     ).toEqual(["system", "user", "assistant", "tool", "assistant", "tool"]);
     expect(JSON.stringify(finalMessages)).not.toContain("unread secret");
+  });
+
+  test("counts failed primary and fallback attempts and restarts only once", async () => {
+    const primaryFailure = new Error("primary unavailable");
+    const complete = vi
+      .fn()
+      .mockRejectedValueOnce(primaryFailure)
+      .mockRejectedValueOnce(new Error("fallback unavailable"))
+      .mockRejectedValueOnce(new Error("unexpected_third_attempt"));
+
+    await expect(
+      runAgent(
+        {
+          messages: [{ role: "user", content: "Question" }],
+          notes: [note],
+          model: "primary/model",
+          fallbackModel: "fallback/model",
+        },
+        { complete },
+      ),
+    ).rejects.toThrow("fallback unavailable");
+    expect(complete).toHaveBeenCalledTimes(2);
+    expect(complete.mock.calls.map(([request]) => request.model)).toEqual([
+      "primary/model",
+      "fallback/model",
+    ]);
+  });
+
+  test("reports an honest zero-note answer activity", async () => {
+    const result = await runAgent(
+      {
+        messages: [{ role: "user", content: "Unknown?" }],
+        notes: [],
+        model: "actual/model",
+      },
+      {
+        complete: vi.fn().mockResolvedValue({
+          model: "actual/model",
+          message: { role: "assistant", content: "Insufficient evidence." },
+        }),
+      },
+    );
+
+    expect(result.activity).toEqual([
+      { type: "answer", message: "Answered from 0 notes" },
+    ]);
   });
 });

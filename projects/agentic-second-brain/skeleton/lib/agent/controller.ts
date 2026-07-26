@@ -5,8 +5,12 @@ import type {
   ProviderConstraints,
 } from "@/lib/model/openrouter";
 import { buildAllContext } from "@/lib/vault/all-context";
+import { listNotes } from "@/lib/vault/list-notes";
+import { readNote } from "@/lib/vault/read-note";
+import { searchNotes } from "@/lib/vault/search-notes";
 import type { VaultNote } from "@/lib/vault/types";
 
+import { executeToolCall } from "./execute-tool";
 import { AGENT_SYSTEM_PROMPT } from "./system-prompt";
 import { NOTE_TOOL_DEFINITIONS } from "./tool-schemas";
 
@@ -26,6 +30,7 @@ export interface AgentRunInput {
   fallbackModel?: string;
   provider?: ProviderConstraints;
   signal?: AbortSignal;
+  requireAgentic?: boolean;
 }
 
 export interface AgentDependencies {
@@ -39,6 +44,7 @@ export interface AgentDependencies {
 }
 
 export interface AgentRunResult {
+  mode: "baseline" | "agentic";
   answer: string;
   model: string;
   restarted: boolean;
@@ -52,7 +58,7 @@ export interface AgentRunResult {
   };
 }
 
-export async function runAgent(
+async function runBaseline(
   input: AgentRunInput,
   deps: AgentDependencies,
 ): Promise<AgentRunResult> {
@@ -73,6 +79,7 @@ export async function runAgent(
     throw new Error("invalid_response");
   }
   return {
+    mode: "baseline",
     answer: completion.message.content,
     model: completion.model,
     restarted: false,
@@ -93,7 +100,34 @@ export async function runAgent(
 }
 
 // LEARNER CHECKPOINT 3 START
-export async function runCheckpointAgent(): Promise<never> {
+async function runLearnerAgent(
+  _input: AgentRunInput,
+  _deps: AgentDependencies,
+): Promise<AgentRunResult> {
+  void _input;
+  void _deps;
+  void executeToolCall;
+  void listNotes;
+  void searchNotes;
+  void readNote;
   throw new Error("checkpoint_not_implemented");
 }
 // LEARNER CHECKPOINT 3 END
+
+export async function runAgent(
+  input: AgentRunInput,
+  deps: AgentDependencies,
+): Promise<AgentRunResult> {
+  try {
+    return await runLearnerAgent(input, deps);
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      error.message !== "checkpoint_not_implemented" ||
+      input.requireAgentic
+    ) {
+      throw error;
+    }
+    return runBaseline(input, deps);
+  }
+}

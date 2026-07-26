@@ -183,7 +183,6 @@ export async function POST(request: Request) {
     );
 
     const response: ChatResponse = {
-      mode: "agentic",
       ...result,
     };
 

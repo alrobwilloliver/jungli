@@ -7,6 +7,7 @@ export interface ToolExecutionContext {
   searchNotes: (query: string) => unknown | Promise<unknown>;
   readNote: (path: string) => unknown | Promise<unknown>;
   uniqueNoteReads: Set<string>;
+  maxUniqueNoteReads?: number;
 }
 
 export type ToolExecutionResult =
@@ -24,6 +25,7 @@ export type ToolExecutionResult =
         | "invalid_arguments"
         | "unknown_tool"
         | "unsafe_path"
+        | "read_limit"
         | "missing_note";
       output: string;
     };
@@ -117,7 +119,25 @@ export async function executeToolCall(
   }
 
   const duplicate = context.uniqueNoteReads.has(path);
-  if (!duplicate) context.uniqueNoteReads.add(path);
+  if (duplicate) {
+    return {
+      ok: true,
+      name,
+      output: evidence({
+        duplicate: true,
+        message: `Note already read: ${path}`,
+      }),
+      readPath: path,
+      duplicate: true,
+    };
+  }
+  if (
+    context.maxUniqueNoteReads !== undefined &&
+    context.uniqueNoteReads.size >= context.maxUniqueNoteReads
+  ) {
+    return rejected("read_limit", "unique note read limit reached.");
+  }
+  context.uniqueNoteReads.add(path);
   try {
     const note = await context.readNote(path);
     return {
@@ -128,7 +148,7 @@ export async function executeToolCall(
       duplicate,
     };
   } catch {
-    if (!duplicate) context.uniqueNoteReads.delete(path);
+    context.uniqueNoteReads.delete(path);
     return {
       ok: false,
       code: "missing_note",

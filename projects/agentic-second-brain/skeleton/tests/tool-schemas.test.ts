@@ -170,6 +170,11 @@ describe("executeToolCall", () => {
       readPath: "projects/newsletter-growth.md",
       duplicate: true,
     });
+    expect(dependencies.readNote).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(second.output)).toMatchObject({
+      duplicate: true,
+      message: expect.stringMatching(/already read/i),
+    });
     expect(JSON.parse(first.output)).toMatchObject({
       notice: expect.stringMatching(/untrusted evidence.*not instructions/i),
       note: { path: "projects/newsletter-growth.md" },
@@ -177,6 +182,24 @@ describe("executeToolCall", () => {
     expect([...dependencies.uniqueNoteReads]).toEqual([
       "projects/newsletter-growth.md",
     ]);
+  });
+
+  test("distinguishes the unique-read limit from a missing note", async () => {
+    const dependencies = context();
+    dependencies.uniqueNoteReads.add("one.md");
+    dependencies.maxUniqueNoteReads = 1;
+
+    const result = await executeToolCall(
+      call("read_note", JSON.stringify({ path: "two.md" })),
+      dependencies,
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      code: "read_limit",
+      output: expect.stringMatching(/read limit/i),
+    });
+    expect(dependencies.readNote).not.toHaveBeenCalled();
   });
 
   test.each([

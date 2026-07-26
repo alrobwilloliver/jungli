@@ -1,14 +1,33 @@
 # Rehearsal record
 
-Before teaching, record the date, machine, Node version, and elapsed minutes for:
+## Automated instructor-equivalent verification — 2026-07-26
 
-- installing and starting skeleton on port 3000;
-- completing the mocked tool and controller checkpoints;
-- asking Sam's newsletter question and seeing search → read → cited answer;
-- performing the exact minute-25 three-file recovery;
-- starting finished with `npm run dev -- --port 3001`.
+Verified in the class worktree:
 
-Target cutovers are minute 25 and minute 45. If either checkpoint misses its
-cutover, use the documented recovery immediately. A live-key run and a
-beginner-paced rehearsal remain instructor responsibilities because CI uses
-mocked model calls and cannot validate current provider behavior.
+- skeleton default suite: 12 files and 133 tests passed; formatting, lint,
+  typecheck, and production build passed;
+- finished default suite: 13 files and 155 tests passed; formatting, lint,
+  typecheck, and production build passed;
+- finished mocked checkpoints: 8 tool tests and 1 controller test passed;
+- the skeleton's intentional learner checkpoints fail only at
+  `checkpoint_not_implemented`;
+- the compatibility command completes its dry path without HTTP;
+- personal vault content is ignored and absent from production tracing config.
+
+These checks establish that the prepared fallback and deterministic classroom
+checkpoints run. They do not establish human teaching pace or live-provider
+behavior.
+
+## BLOCKED / unverified before teaching
+
+- **Beginner under-45-minute build:** BLOCKED until a beginner-paced human
+  rehearsal records elapsed time for prompts 1–3 and the minute-25 recovery.
+- **Browser demonstration:** BLOCKED until an instructor starts skeleton on
+  port 3000 and finished on port 3001 and verifies the visible activity,
+  sources, and cited Sam answer.
+- **Live model compatibility:** BLOCKED until an instructor with an approved API
+  key runs `npm run check-models -- --live` against the chosen model/provider.
+- **Personal-vault policy review:** BLOCKED until the instructor checks the
+  current OpenRouter and upstream-provider policies.
+
+Do not mark these complete from automated test evidence alone.

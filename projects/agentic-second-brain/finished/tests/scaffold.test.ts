@@ -10,7 +10,7 @@ const normaliseProse = (source: string) =>
   source.replace(/^>\s?/gm, "").replace(/\s+/g, " ");
 
 describe("workshop scaffold", () => {
-  test("provides the required scripts without check-models", async () => {
+  test("provides the required scripts including the model checker", async () => {
     const packageJson = JSON.parse(
       await readFile(projectFile("package.json"), "utf8"),
     ) as { scripts: Record<string, string> };
@@ -25,7 +25,10 @@ describe("workshop scaffold", () => {
       test: "vitest run",
       "test:watch": "vitest",
     });
-    expect(packageJson.scripts).not.toHaveProperty("check-models");
+    expect(packageJson.scripts).toHaveProperty(
+      "check-models",
+      "node --experimental-strip-types scripts/check-models.ts",
+    );
   });
 
   test("keeps key setup server-side for local and deployed use", async () => {

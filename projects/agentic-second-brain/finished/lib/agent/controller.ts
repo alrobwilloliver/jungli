@@ -42,6 +42,7 @@ export interface AgentDependencies {
 }
 
 export interface AgentRunResult {
+  mode: "agentic";
   answer: string;
   model: string;
   restarted: boolean;
@@ -82,10 +83,12 @@ export async function runAgent(
   let actualModel = input.model;
   let modelCalls = 0;
   let restarted = false;
+  let pinnedModel: string | undefined;
 
   for (; modelCalls < AGENT_LIMITS.maxModelCalls;) {
     let completion: ModelCompletion;
     try {
+      modelCalls += 1;
       completion = await deps.complete({
         model: actualModel,
         messages: transcript,
@@ -93,9 +96,13 @@ export async function runAgent(
         provider: input.provider,
         signal: input.signal,
       });
-      modelCalls += 1;
     } catch (error) {
-      if (!modelCalls && !uniqueReads.size && input.fallbackModel) {
+      if (
+        modelCalls === 1 &&
+        !restarted &&
+        !uniqueReads.size &&
+        input.fallbackModel
+      ) {
         actualModel = input.fallbackModel;
         restarted = true;
         activity.push({
@@ -107,9 +114,10 @@ export async function runAgent(
       throw error;
     }
 
-    if (modelCalls === 1 || (restarted && modelCalls === 1)) {
-      actualModel = completion.model;
-    } else if (completion.model !== actualModel) {
+    if (!pinnedModel) {
+      pinnedModel = completion.model;
+      actualModel = pinnedModel;
+    } else if (completion.model !== pinnedModel) {
       throw new Error("model_identity_changed");
     }
 
@@ -119,9 +127,12 @@ export async function runAgent(
       const answer = message.content?.trim() || fallbackAnswer;
       activity.push({
         type: "answer",
-        message: "Answered from selected evidence",
+        message: `Answered from ${sources.length} ${
+          sources.length === 1 ? "note" : "notes"
+        }`,
       });
       return {
+        mode: "agentic",
         answer,
         model: actualModel,
         restarted,
@@ -150,15 +161,10 @@ export async function runAgent(
           listNotes: (folder) => listNotes(input.notes, folder),
           searchNotes: (query) => searchNotes(input.notes, query),
           readNote: (path) => {
-            if (
-              !uniqueReads.has(path) &&
-              uniqueReads.size >= AGENT_LIMITS.maxUniqueReads
-            ) {
-              throw new Error("read_limit");
-            }
             return readNote(input.notes, path);
           },
           uniqueNoteReads: uniqueReads,
+          maxUniqueNoteReads: AGENT_LIMITS.maxUniqueReads,
         }),
       ),
     );
@@ -175,8 +181,24 @@ export async function runAgent(
         content: output,
       });
       if (result.ok) {
-        const type = result.name === "read_note" ? "read" : "search";
-        activity.push({ type, message: `${result.name} completed` });
+        if (result.name === "search_notes") {
+          const parsedArguments = JSON.parse(call.function.arguments) as {
+            query: string;
+          };
+          activity.push({
+            type: "search",
+            message: `Searching notes for "${parsedArguments.query}"`,
+          });
+        } else if (result.name === "read_note" && result.readPath) {
+          activity.push({
+            type: "read",
+            message: result.duplicate
+              ? `Already read ${result.readPath}`
+              : `Reading ${result.readPath}`,
+          });
+        } else {
+          activity.push({ type: "search", message: "Listing notes" });
+        }
         if (
           result.readPath &&
           !result.duplicate &&
@@ -191,13 +213,19 @@ export async function runAgent(
   }
 
   return {
+    mode: "agentic",
     answer: fallbackAnswer,
     model: actualModel,
     restarted,
     sources,
     activity: [
       ...activity,
-      { type: "answer", message: "Stopped at the model-call limit" },
+      {
+        type: "answer",
+        message: `Answered from ${sources.length} ${
+          sources.length === 1 ? "note" : "notes"
+        }`,
+      },
     ],
     usage: {
       modelCalls,

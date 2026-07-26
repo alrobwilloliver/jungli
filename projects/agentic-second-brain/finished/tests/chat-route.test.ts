@@ -141,7 +141,7 @@ describe("POST /api/chat", () => {
       activity: [
         {
           type: "answer",
-          message: "Answered from selected evidence",
+          message: "Answered from 0 notes",
         },
       ],
       usage: {
