@@ -27,7 +27,8 @@ export default function RootLayout({
         <footer className="site-footer">
           <div className="shell">
             <p>
-              Your notes stay in your project. Your key stays on the server.
+              Your note files stay in your project, but note contents are sent
+              to OpenRouter when you chat. Your key stays on the server.
             </p>
           </div>
         </footer>

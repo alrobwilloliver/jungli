@@ -143,7 +143,7 @@ Ask it about **Sam** — and try a question it *can't* know.
 - An **API** = asking another service (the AI model) to do something for you.
 - An **API key** = your **password** to that service.
 - Create **one free OpenRouter key** — no card. Still **secret**:
-  it is tied to your account (**~50 requests/day** free; see
+  it is tied to your account (**~50 requests/day** free, **checked July 2026**; see
   [official limits](https://openrouter.ai/docs/api/reference/limits)).
 - Set the model to exactly **`openrouter/free`**. OpenRouter picks an
   available free model for each request; the response says which one.

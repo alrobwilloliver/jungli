@@ -72,8 +72,8 @@ ONLY that context. If the answer isn't there, say so.
 - Store it in an **environment variable** / `.env`; add `.env` to `.gitignore`.
 - ⚠️ **The classic disaster:** committing a key to a public repo — what happens and
   why it's bad.
-- Name the **free-tier limit** out loud: ~50 requests/day per account (failed tries
-  count) — wait or add $10 for 1,000/day. See the
+- Name the **free-tier limit** out loud: ~50 requests/day per account (**checked
+  July 2026**; failed tries count) — wait or add $10 for 1,000/day. See the
   [official limits](https://openrouter.ai/docs/api/reference/limits).
 
 **Resources:** [`chat-agent/skeleton/MODEL-SETUP.md`](../../projects/chat-agent/skeleton/MODEL-SETUP.md)

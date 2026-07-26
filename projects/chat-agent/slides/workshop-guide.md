@@ -187,10 +187,11 @@ Deploy to Vercel. Add the API key as an environment variable in the Vercel proje
 > **The key lives in Vercel's settings — never in the code you push.**
 
 **Cost & limits:** every chat message is a real **API call**. On OpenRouter's free
-tier that's **~50 requests/day** per account (failed tries count) — plenty to build
-today. Hit the wall? Wait for the reset or add **$10 of credits** for 1,000/day.
-See the [official limits](https://openrouter.ai/docs/api/reference/limits). It's
-separate from your Claude plan; details in
+tier that's **~50 requests/day** per account (**checked July 2026**; failed tries
+count) — plenty to build today. Hit the wall? Wait for the reset or add **$10 of
+credits** for 1,000/day. See the
+[official limits](https://openrouter.ai/docs/api/reference/limits). It's separate
+from your Claude plan; details in
 [`MODEL-SETUP.md`](../skeleton/MODEL-SETUP.md).
 
 ---

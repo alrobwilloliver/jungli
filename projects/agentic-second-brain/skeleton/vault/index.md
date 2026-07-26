@@ -19,4 +19,6 @@ tags: [index, career, sample]
 
 - [Skills — marketing](career/skills-marketing.md)
 
-> Sample data for teaching. Replace with notes about you or your product.
+> Sample data for teaching. Keep the shared exercise fictional. Before using
+> personal or product notes, review and accept your selected model provider's
+> data policy.

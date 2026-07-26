@@ -75,6 +75,6 @@ settings (not in the code).
 - Answer **only** from context; if unknown, say so.
 - Each chat message is a real **API call**. We use **`openrouter/free`**
   ([`MODEL-SETUP.md`](MODEL-SETUP.md)) — mind the **~50 requests/day** free limit
-  (add $10 of credits for 1,000/day if you need more; see the
+  (**checked July 2026**; add $10 of credits for 1,000/day if you need more; see the
   [official limits](https://openrouter.ai/docs/api/reference/limits)).
 - Never commit real personal data or your API key.
