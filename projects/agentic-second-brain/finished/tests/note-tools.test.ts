@@ -130,6 +130,16 @@ describe("searchNotes", () => {
     expect(JSON.stringify(result)).not.toContain(secretTail);
   });
 
+  test("keeps the matched body term in a snippet after a long normalized prefix", () => {
+    const result = searchNotes(
+      [note("punctuation.md", "Punctuation", `${"!".repeat(500)}needle tail`)],
+      "needle",
+    );
+
+    expect(result[0].snippet).toContain("needle");
+    expect(result[0].snippet.length).toBeLessThanOrEqual(320);
+  });
+
   test("returns no results for a punctuation-only query", () => {
     expect(searchNotes([note("one.md", "One", "body")], " ... !!! ")).toEqual(
       [],
@@ -152,6 +162,29 @@ describe("readNote", () => {
     expect([...reads]).toEqual(["career/about.md", "projects/launch.md"]);
   });
 
+  test("round-trips exact opaque paths emitted by listing and search", () => {
+    const opaqueNotes = [
+      note("notes/literal%20.md", "Encoded-looking", "opaque evidence"),
+      note("notes/100%.md", "Percent", "opaque evidence"),
+      note("notes/%ZZ.md", "Malformed escape", "opaque evidence"),
+    ];
+    const emittedPaths = new Set([
+      ...listNotes(opaqueNotes).map(({ path }) => path),
+      ...searchNotes(opaqueNotes, "opaque").map(({ path }) => path),
+    ]);
+
+    expect([...emittedPaths]).toEqual([
+      "notes/%ZZ.md",
+      "notes/100%.md",
+      "notes/literal%20.md",
+    ]);
+    expect(
+      [...emittedPaths].map((emittedPath) =>
+        readNote(opaqueNotes, emittedPath),
+      ),
+    ).toEqual([opaqueNotes[2], opaqueNotes[1], opaqueNotes[0]]);
+  });
+
   test.each([
     ["unknown.md", "unknown"],
     ["/career/about.md", "absolute"],
@@ -160,6 +193,7 @@ describe("readNote", () => {
     ["career/../../secret.md", "traversal"],
     ["%2e%2e%2fsecret.md", "traversal"],
     ["%252e%252e%252fsecret.md", "traversal"],
+    ["%2fetc%2fsecret.md", "absolute"],
   ])("rejects %s without changing accounting", (requestedPath, reason) => {
     const reads = new Set<string>();
 

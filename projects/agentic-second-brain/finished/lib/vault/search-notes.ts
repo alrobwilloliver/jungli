@@ -40,14 +40,22 @@ const scoreNote = (note: VaultNote, query: string, queryTerms: string[]) => {
   return score;
 };
 
+const firstBodyMatchOffset = (body: string, queryTerms: string[]) => {
+  const queryTermSet = new Set(queryTerms);
+
+  for (const match of body.matchAll(/[\p{Letter}\p{Number}]+/gu)) {
+    if ([...termsFor(match[0])].some((term) => queryTermSet.has(term))) {
+      return match.index;
+    }
+  }
+
+  return undefined;
+};
+
 const snippetFor = (body: string, queryTerms: string[]) => {
   if (body.length <= MAX_SNIPPET_CHARACTERS) return body;
 
-  const normalizedBody = normalize(body);
-  const firstMatch = queryTerms
-    .map((term) => normalizedBody.indexOf(term))
-    .filter((index) => index >= 0)
-    .sort((left, right) => left - right)[0];
+  const firstMatch = firstBodyMatchOffset(body, queryTerms);
   const start =
     firstMatch === undefined
       ? 0

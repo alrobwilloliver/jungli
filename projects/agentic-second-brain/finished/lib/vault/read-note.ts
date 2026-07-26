@@ -2,36 +2,31 @@ import path from "node:path";
 
 import type { VaultNote } from "./types";
 
-const decodePath = (requestedPath: string) => {
-  let decoded = requestedPath;
+const decodeSafetyEscapes = (value: string) =>
+  value.replace(/%([0-9a-f]{2})/gi, (_escape, hex: string) =>
+    String.fromCharCode(Number.parseInt(hex, 16)),
+  );
 
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    let next: string;
-    try {
-      next = decodeURIComponent(decoded);
-    } catch {
-      throw new Error("Invalid note path.");
-    }
-    if (next === decoded) return decoded;
-    decoded = next;
-  }
-
-  return decoded;
-};
-
-const validatePath = (requestedPath: string) => {
-  const decoded = decodePath(requestedPath);
-
-  if (path.posix.isAbsolute(decoded) || path.win32.isAbsolute(decoded)) {
+const validatePathVariant = (value: string) => {
+  if (path.posix.isAbsolute(value) || path.win32.isAbsolute(value)) {
     throw new Error("Cannot read an absolute note path.");
   }
 
-  const segments = decoded.replaceAll("\\", "/").split("/");
+  const segments = value.replaceAll("\\", "/").split("/");
   if (segments.includes("..")) {
     throw new Error("Cannot read a note path containing traversal.");
   }
+};
 
-  return decoded;
+const validatePath = (requestedPath: string) => {
+  let safetyVariant = requestedPath;
+
+  while (true) {
+    validatePathVariant(safetyVariant);
+    const next = decodeSafetyEscapes(safetyVariant);
+    if (next === safetyVariant) return;
+    safetyVariant = next;
+  }
 };
 
 export function readNote(
@@ -39,11 +34,11 @@ export function readNote(
   requestedPath: string,
   uniqueReads?: Set<string>,
 ): VaultNote {
-  const safePath = validatePath(requestedPath);
-  const note = notes.find((candidate) => candidate.path === safePath);
+  validatePath(requestedPath);
+  const note = notes.find((candidate) => candidate.path === requestedPath);
 
   if (!note) {
-    throw new Error(`Unknown note path: ${safePath}`);
+    throw new Error(`Unknown note path: ${requestedPath}`);
   }
 
   uniqueReads?.add(note.path);
