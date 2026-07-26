@@ -78,6 +78,24 @@ describe("searchNotes", () => {
     ]);
   });
 
+  test("ranks a body-only term below title, tag, and folder matches", () => {
+    const notes = [
+      note("body.md", "Body only", "launch"),
+      note("folder/term.md", "Folder only", "none", { folder: "launch" }),
+      note("tag.md", "Tag only", "none", { tags: ["launch"] }),
+      note("title.md", "Launch plan", "none"),
+    ];
+
+    expect(
+      searchNotes(notes, "launch").map(({ path, score }) => [path, score]),
+    ).toEqual([
+      ["title.md", 6],
+      ["tag.md", 4],
+      ["folder/term.md", 3],
+      ["body.md", 1],
+    ]);
+  });
+
   test("normalizes case and punctuation and scores every multi-word term", () => {
     const notes = [
       note("projects/growth.md", "Newsletter Growth", "Retention lessons", {
