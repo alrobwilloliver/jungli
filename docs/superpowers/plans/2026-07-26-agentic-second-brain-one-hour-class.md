@@ -143,6 +143,9 @@ vector storage.
 - Modify: both `lib/contracts.ts`
 - Modify: both `app/page.tsx`
 - Modify: both `app/globals.css`
+- Modify: both `app/api/chat/route.ts`
+- Modify: both `tests/contracts.test.ts`
+- Modify: both `tests/chat-route.test.ts`
 - Create: both `lib/agent/{tool-schemas,execute-tool}.ts`
 - Create: both `tests/tool-schemas.test.ts`
 - Create: both `tests/project-parity.test.ts`
@@ -170,16 +173,18 @@ Expected: both fail because the prepared support modules are absent.
 
 Implement the strict three schemas and complete validated closed dispatcher in
 both projects using the frozen API. Dispatch only to imported deterministic
-tool functions. The skeleton functions do not exist until Task 2, so its
-dispatcher accepts them through `ToolExecutionContext` dependencies rather
-than importing completed implementations. Label all results as untrusted
-evidence.
+tool dependencies supplied through `ToolExecutionContext`; use the same
+dependency-injection model in both projects. The skeleton functions do not
+exist until Task 2. Label all results as untrusted evidence.
 
 - [ ] **Step 4: Prepare the shared dual-mode UI**
 
 Render baseline or agentic badges from `response.mode`; always support activity,
 sources, model, restart, model calls, notes sent/read, and context characters.
 Keep existing loading, rollback, history bounds, errors, and accessibility.
+Migrate both existing baseline routes and their contract/route fixtures to
+return `mode: "baseline"`, `restarted: false`, and `usage.notesRead: 0` without
+changing all-context behavior.
 
 - [ ] **Step 5: Verify both projects are green**
 
@@ -363,7 +368,16 @@ Expected: both exit 0.
 Cover malformed arguments, unknown names, duplicate calls, and stable-order
 parallel calls.
 
-- [ ] **Step 10: Implement minimal handling and verify GREEN**
+- [ ] **Step 10: Verify Slice C RED**
+
+```bash
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/controller.test.ts
+```
+
+Expected: FAIL on the newly added malformed/duplicate/parallel behavior.
+
+- [ ] **Step 11: Implement minimal handling and verify GREEN**
 
 ```bash
 npm --prefix projects/agentic-second-brain/finished test -- \
@@ -374,7 +388,7 @@ Expected: exit 0.
 
 #### Slice D: Application bounds and retrieval minimisation
 
-- [ ] **Step 11: Add RED tests**
+- [ ] **Step 12: Add RED tests**
 
 Cover three model calls, four unique reads, six recent messages, 4,000-character
 question, 12,000-character tool output, every search snippet within its
@@ -382,7 +396,17 @@ configured bound, successful-read-only sources, and honest step exhaustion.
 Inspect every request: complete raw unread bodies must be absent; bounded search
 snippets may be present.
 
-- [ ] **Step 12: Implement bounds and verify GREEN**
+- [ ] **Step 13: Verify Slice D RED**
+
+```bash
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/controller.test.ts
+```
+
+Expected: FAIL on at least one newly added bound or retrieval-minimisation
+assertion.
+
+- [ ] **Step 14: Implement bounds and verify GREEN**
 
 ```bash
 npm --prefix projects/agentic-second-brain/finished test -- \
@@ -394,13 +418,23 @@ successful-source-only, bounded-snippet, and unread-body assertions passing.
 
 #### Slice E: Model identity, fallback, and provider failures
 
-- [ ] **Step 13: Add RED tests**
+- [ ] **Step 15: Add RED tests**
 
 Cover router alias first-model pinning, later identity mismatch, clean fallback
 only before successful tool work, no transcript-ID mixing, timeout, rate limit,
 unavailable model, incompatible response, and accurate total calls/restart.
 
-- [ ] **Step 14: Implement and verify GREEN**
+- [ ] **Step 16: Verify Slice E RED**
+
+```bash
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/controller.test.ts
+```
+
+Expected: FAIL on at least one new identity, fallback, or failure-class
+assertion.
+
+- [ ] **Step 17: Implement and verify GREEN**
 
 ```bash
 npm --prefix projects/agentic-second-brain/finished test -- \
@@ -411,17 +445,17 @@ Expected: exit 0.
 
 #### Slice F: Finished route and shared UI contract
 
-- [ ] **Step 15: Replace copied finished route expectations**
+- [ ] **Step 18: Replace copied finished route expectations**
 
 Assert `mode: "agentic"`, selected sources/activity, actual model, restart,
 model-call/read counts, and friendly error mappings.
 
-- [ ] **Step 16: Connect finished route**
+- [ ] **Step 19: Connect finished route**
 
 Remove finished all-context production/test files together. The shared UI
 already renders agent fields.
 
-- [ ] **Step 17: Create and verify controller checkpoints**
+- [ ] **Step 20: Create and verify controller checkpoints**
 
 Both checkpoint tests use the same mocked transcript. Finished passes. Skeleton
 fails only because its marked `LEARNER CHECKPOINT 3` region still returns
@@ -438,7 +472,7 @@ npm --prefix projects/agentic-second-brain/skeleton run \
 Expected: finished exits 0; skeleton fails only with
 `checkpoint_not_implemented`.
 
-- [ ] **Step 18: Verify both full projects**
+- [ ] **Step 21: Verify both full projects**
 
 ```bash
 npm --prefix projects/agentic-second-brain/skeleton test
@@ -455,7 +489,7 @@ npm --prefix projects/agentic-second-brain/finished run build
 
 Expected: all exit 0.
 
-- [ ] **Step 19: Commit**
+- [ ] **Step 22: Commit**
 
 ```bash
 git add projects/agentic-second-brain/skeleton projects/agentic-second-brain/finished
@@ -520,12 +554,24 @@ Every call, retry, and restarted run must contain:
 }
 ```
 
-- [ ] **Step 6: Thread validated constraints through `AgentRunInput`**
+- [ ] **Step 6: Verify Slice B RED**
+
+```bash
+npm --prefix projects/agentic-second-brain/skeleton test -- \
+  tests/openrouter.test.ts tests/controller.test.ts
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/openrouter.test.ts tests/controller.test.ts
+```
+
+Expected: both fail because provider constraints are not threaded to every
+request.
+
+- [ ] **Step 7: Thread validated constraints through `AgentRunInput`**
 
 The controller passes them to every `deps.complete` invocation. Adapter
 serialises them as OpenRouter's `provider` request object.
 
-- [ ] **Step 7: Verify Slice B GREEN**
+- [ ] **Step 8: Verify Slice B GREEN**
 
 ```bash
 npm --prefix projects/agentic-second-brain/skeleton test -- \
@@ -538,23 +584,45 @@ Expected: all pass.
 
 #### Slice C: Prove personal notes cannot enter builds
 
-- [ ] **Step 8: Write tracing/privacy tests**
+- [ ] **Step 9: Write tracing/privacy tests**
 
 Assert both `next.config.ts` files trace only `vault/**/*.md`, never
 `vault-personal`. Assert personal mode rejects `NODE_ENV=production`, Vercel,
 and build-time contexts. Assert `.gitignore` ignores `vault-personal/`.
 
-- [ ] **Step 9: Implement local-only loading**
+- [ ] **Step 10: Verify Slice C RED**
+
+```bash
+npm --prefix projects/agentic-second-brain/skeleton test -- \
+  tests/vault-config.test.ts tests/project-parity.test.ts
+npm --prefix projects/agentic-second-brain/finished test -- \
+  tests/vault-config.test.ts tests/project-parity.test.ts
+```
+
+Expected: both fail because production/build rejection and tracing assertions
+are not yet implemented.
+
+- [ ] **Step 11: Implement local-only loading**
 
 Do not modify output tracing to include a dynamic/personal directory. Personal
 notes are available only to the local development server at request time.
 
-- [ ] **Step 10: Verify complete green projects**
+- [ ] **Step 12: Verify complete green projects**
 
-Run full tests, format, lint, typecheck, and build in both projects using the
-exact ten commands from Task 3 Step 17.
+```bash
+npm --prefix projects/agentic-second-brain/skeleton test
+npm --prefix projects/agentic-second-brain/skeleton run format:check
+npm --prefix projects/agentic-second-brain/skeleton run lint
+npm --prefix projects/agentic-second-brain/skeleton run typecheck
+npm --prefix projects/agentic-second-brain/skeleton run build
+npm --prefix projects/agentic-second-brain/finished test
+npm --prefix projects/agentic-second-brain/finished run format:check
+npm --prefix projects/agentic-second-brain/finished run lint
+npm --prefix projects/agentic-second-brain/finished run typecheck
+npm --prefix projects/agentic-second-brain/finished run build
+```
 
-- [ ] **Step 11: Commit**
+- [ ] **Step 13: Commit**
 
 ```bash
 git add projects/agentic-second-brain/skeleton projects/agentic-second-brain/finished
@@ -752,7 +820,9 @@ Expected: all exit 0.
 
 ```bash
 git diff --check
-git ls-files | rg '(^|/)(\.env$|vault-personal/|\.vercel/)'
+git ls-files \
+  | rg '(^|/)\.env($|\.)|vault-personal/|(^|/)\.vercel/' \
+  | rg -v '(^|/)\.env\.example$'
 rg -n "vault-personal" \
   projects/agentic-second-brain/skeleton/next.config.ts \
   projects/agentic-second-brain/finished/next.config.ts
@@ -801,7 +871,14 @@ Invoke `superpowers:verification-before-completion` and
 `superpowers:requesting-code-review`. Fix Critical/Important findings with a
 failing regression test first.
 
-- [ ] **Step 8: Record and commit rehearsal evidence**
+- [ ] **Step 8: Re-verify any post-review change**
+
+If browser work or review changes code or docs, repeat the complete clean gates
+from Step 1, privacy checks from Step 2, acceptance commands from Step 5, and
+the affected browser/link check. Expected: all required commands pass before
+staging.
+
+- [ ] **Step 9: Record and commit rehearsal evidence**
 
 Always commit `REHEARSAL.md` after an attempted validation. If beginner
 rehearsal is unavailable or exceeds 45 minutes, record `BLOCKED` and the
